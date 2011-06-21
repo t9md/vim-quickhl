@@ -76,21 +76,14 @@ function! s:o.del(word)"{{{
     call s:o.refresh()
 endfunction"}}}
 function! s:o.list()"{{{
-    for c in self.colors
-        if c.keyword == s:def_str | continue | endif
-        let cmd =  "echohl ". c.hlname
-        exe cmd
+    for c in filter(copy(self.colors), 'v:val.keyword != s:def_str ')
+        exe  "echohl ". c.hlname
         echo c.keyword
         echohl None
     endfor
 endfunction"}}}
 function! s:o.has_keyword(word)"{{{
-    for c in self.colors
-        if c.keyword == a:word
-            return 1
-        endif
-    endfor
-    return 0
+    return len(filter(copy(self.colors), 'v:val.keyword == a:word')) != 0
 endfunction"}}}
 function! s:o.reset()"{{{
     call self.syn_clear()
