@@ -163,7 +163,8 @@ function! quickhl#show_colors()"{{{
 endfunction"}}}
 
 function! quickhl#delete(word)"{{{
-    let idx = self.id_for(a:word)
+    let idx = s:o.id_for(a:word)
+    call s:o.debug("delete for " . idx)
     if idx != -1
         let cmd = "syntax clear QuickMatch" . idx
         exe cmd

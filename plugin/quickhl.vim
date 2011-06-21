@@ -45,6 +45,7 @@ command! QuickHLClear         :call quickhl#clear_all()
 command! QuickHLShowColors    :call quickhl#show_colors()
 command! QuickHLRenewColors   :call quickhl#renew_colors()
 command! -nargs=1 QuickHLAdd  :call quickhl#add(<q-args>)
+command! -nargs=1 QuickHLDel  :call quickhl#delete(<q-args>)
 "}}}
 
 let g:quick_hl_debug = 0
