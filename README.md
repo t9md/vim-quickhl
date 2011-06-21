@@ -1,13 +1,11 @@
 Command
 -----------------------------------------------------------------
-* QuickHLList         #Show registerd keyword list with color.
-* QuickHLClear        #Clear all.
-* QuickHLShowColors   #Check colors.
-* QuickHLRenewColors  #Re-initialize color table.
-* QuickHLAdd          #Add word.
-    :QuickHLAdd the_word
-* QuickHLDel          #Delete word.
-    :QuickHLDel the_word
+* QuickHLList           Show registerd keyword list with color.
+* QuickHLClear          Clear all.
+* QuickHLShowColors     Check colors.
+* QuickHLRenewColors    Re-initialize color table.
+* QuickHLAdd  word      Add word.
+* QuickHLDel  word      Delete word.
 
 KeyMap Example
 -----------------------------------------------------------------
