@@ -1,130 +1,93 @@
 let s:o = {}
 let s:o.name = "QuickHL"
-
-function! s:o.init_color()"{{{
-    for num in range(len(g:quick_hl_colors))
-        let cmd = "highlight QuickMatch". num . " " . g:quick_hl_colors[num]
-        exe cmd
-    endfor
-endfunction"}}}
-
-function! s:o.show_colors()"{{{
-    for num in range(len(g:quick_hl_colors))
-        let cmd = "highlight QuickMatch". num
-        exe cmd
-    endfor
-endfunction"}}}
-
-function! s:o.init()"{{{
-    let self.keywords = {}
-    let self.pointer = 0
-    call self.init_color()
-endfunction"}}}
-
-function! s:o.inc_pointer()"{{{
-    let self.pointer = (self.pointer + 1) % len(g:quick_hl_colors)
-endfunction"}}}
-
 function! s:o.debug(msg)"{{{
-    if !g:quick_hl_debug
-        return
+    if !g:quickhl_debug | return | endif
+    echo "[". self.name. "] " . string(a:msg)
+endfunction"}}}
+function! s:o.init()"{{{
+    let self.pointer = 0
+    call s:o.read_colors( g:quickhl_colors )
+    call s:o.init_highlight()
+endfunction"}}}
+function! s:o.inc_pointer()"{{{
+    let self.pointer = (self.pointer + 1) % len(self.colors)
+    return self.pointer
+endfunction"}}}
+function! s:o.read_colors(list)"{{{
+    let self.colors = []
+    for idx in range(len(a:list))
+        call add(self.colors, {
+                    \ "hlname" : "QuickHL".idx,
+                    \ "hlval" : a:list[idx],
+                    \ })
+    endfor
+endfunction"}}}
+function! s:o.init_highlight()"{{{
+    for c in self.colors
+        let cmd = "highlight " . c.hlname . " " . c.hlval
+        exe cmd
+    endfor
+endfunction"}}}
+function! s:o.show_colors()"{{{
+    for c in self.colors
+        let cmd = "highlight " . c.hlname
+        exe cmd
+    endfor
+endfunction"}}}
+function! s:o.add(word)"{{{
+    " guard duplicate entry
+    if self.has_keyword(a:word)
+        call self.debug("already registerd " . a:word)
+        return -1
     endif
-    echo "[". self.name."] " . string(a:msg)
-endfunction"}}}
+    let idx = self.pointer
+    let self.colors[idx].keyword = a:word
+    call self.debug("newly registerd " . a:word)
+    call self.inc_pointer()
 
-function! s:o.add_keyword(word)"{{{
-    call self.debug("word added: " . a:word)
-    let idx = self.id_for(a:word)
-    call self.debug("id is " . idx)
-    if idx != -1
-        call self.debug("dup " . a:word)
-        let self.keywords[idx] = a:word
-    else
-        call self.debug("new " . a:word)
-        let self.keywords[self.pointer] = a:word
-    endif
-        call self.inc_pointer()
+    let c = self.colors[idx]
+    exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
 endfunction"}}}
-
-function! s:o.delete_keyword(word)"{{{
-    let idx = self.id_for(a:word)
-    call remove(self.keywords, idx)
-    call self.debug("word deleted: " . a:word)
-endfunction"}}}
-
-function! s:o.id_for(word)"{{{
-    for [key, val] in items(self.keywords)
-        if val == a:word
-            return key
+function! s:o.del(word)"{{{
+    for idx in range(len(self.colors))
+        let c = self.colors[idx]
+        if has_key(c, "keyword") && c.keyword == a:word
+            call self.debug("delete " . a:word)
+            let cmd = "syntax clear " . c.hlname
+            exe cmd
+            call remove(c, "keyword")
         endif
     endfor
-    return -1
 endfunction"}}}
-
-function! s:o.do(word)"{{{
-    call self.debug("do for " . a:word)
-    let idx = self.id_for(a:word)
-    call self.debug("in do idx was " . idx)
-    if idx == -1 | return | endif
-    let cmd = self.syn_cmd_for(idx)
-    call self.debug("cmd :" . cmd)
-    exe cmd
-endfunction"}}}
-
-function! s:o.syn_cmd_for(num)"{{{
-    call self.debug("in syn_cmd_for")
-    call self.debug(self.keywords)
-    let keyword = self.keywords[a:num]
-    let cmd = "syntax match QuickMatch" . a:num . " '" .  keyword . "' " . "containedin=ALL"
-    return cmd
-endfunction"}}}
-
-function! s:o.do_by_num(num)"{{{
-    let cmd = self.syn_cmd_for(a:num)
-    exe cmd
-    " exe `self.syn_cmd_for(a:num)`
-endfunction"}}}
-
-function! s:o.list() "{{{
-    for num in sort(keys(self.keywords))
-        exe 'echohl QuickMatch' . num
-        echo self.keywords[num]
+function! s:o.list()"{{{
+    for c in self.colors
+        if !has_key(c, "keyword") | continue | endif
+        let cmd =  "echohl ". c.hlname
+        exe cmd
+        echo c.keyword
         echohl None
     endfor
 endfunction"}}}
-
-" function! s:o.list() "{{{
-    " for [num, word] in items(self.keywords)
-        " echo num word
-    " endfor
-" endfunction"}}}
-function! s:o.clear_all()"{{{
-    for num in range(len(g:quick_hl_colors))
-        let cmd = "syntax clear QuickMatch" . num
-        exe cmd
+function! s:o.has_keyword(word)"{{{
+    for c in self.colors
+        if has_key(c, "keyword") && c.keyword == a:word
+            return 1
+        endif
     endfor
-    let self.keywords = {}
-    let self.pointer = 0
+    return 0
 endfunction"}}}
-
-function! s:o.clear_for(word)"{{{
-    let idx = self.id_for(a:word)
-    if idx == -1 | return | endif
-    let cmd = "syntax clear QuickMatch" . idx
-    exe cmd
+function! s:o.reset()"{{{
+    for c in self.colors
+        exe "syn clear " . c.hlname
+    endfor
+    call self.init()
 endfunction"}}}
-
-function! s:o.toggle_for(word)"{{{
-    let idx = self.id_for(a:word)
-    if idx == -1
-        call self.add_keyword(a:word)
-        call self.do(a:word)
+function! s:o.toggle(word)"{{{
+    if !self.has_keyword(a:word)
+        call self.add(a:word)
     else
-        let cmd = "syntax clear QuickMatch" . idx
-        exe cmd
-        call self.delete_keyword(a:word)
+        call self.del(a:word)
     endif
-    call self.debug( self.keywords )
 endfunction"}}}
 
 call s:o.init()
@@ -142,36 +105,23 @@ function! quickhl#toggle(mode)"{{{
         let pat = expand('<cword>')
     endif
     let pat = escape(pat, '/')
-    call s:o.toggle_for(pat)
+    call s:o.toggle(pat)
 endfunction"}}}
-
 function! quickhl#list()"{{{
     call s:o.list()
 endfunction"}}}
-
-function! quickhl#clear_all()"{{{
-    call s:o.clear_all()
+function! quickhl#reset()"{{{
+    call s:o.reset()
 endfunction"}}}
-
 function! quickhl#add(word)"{{{
-    call s:o.add_keyword(a:word)
-    call s:o.do(a:word)
+    call s:o.add(a:word)
 endfunction"}}}
-
-function! quickhl#show_colors()"{{{
+function! quickhl#del(word)"{{{
+    call s:o.del(a:word)
+endfunction"}}}
+function! quickhl#colors()"{{{
     call s:o.show_colors()
 endfunction"}}}
-
-function! quickhl#delete(word)"{{{
-    let idx = s:o.id_for(a:word)
-    call s:o.debug("delete for " . idx)
-    if idx != -1
-        let cmd = "syntax clear QuickMatch" . idx
-        exe cmd
-        call s:o.delete_keyword(a:word)
-    endif
-endfunction"}}}
-
 function! quickhl#renew_colors()"{{{
     call s:o.init_color()
 endfunction"}}}

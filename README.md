@@ -1,23 +1,22 @@
 Command
 -----------------------------------------------------------------
-* QuickHLList           Show registerd keyword list with color.
-* QuickHLClear          Clear all.
-* QuickHLShowColors     Check colors.
-* QuickHLRenewColors    Re-initialize color table.
-* QuickHLAdd  word      Add word.
-* QuickHLDel  word      Delete word.
+* QuickhlList           Show registerd keyword list with color.
+* QuickhlReset          Reset all.
+* QuickhlShowColors     Check colors.
+* QuickhlAdd  word      Add word.
+* QuickhlDel  word      Delete word.
 
 KeyMap Example
 -----------------------------------------------------------------
     nmap <Space>m <Plug>(quickhl#toggle)
     vmap <Space>m <Plug>(quickhl#toggle)
-    nmap <Space>M <Plug>(quickhl#clear_all)
+    nmap <Space>M <Plug>(quickhl#reset)
 
 Variables
 -----------------------------------------------------------------
-If you want to change default color, set `g:quick_hl_colors` array like following in your `.vimrc`.
+If you want to change default color, set `g:quickhl_colors` array like following in your `.vimrc`.
 
-    let g:quick_hl_colors = [
+    let g:quickhl_colors = [
           \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
           \ "gui=bold guibg=#a07040 guifg=#ffffff",
           \ "gui=bold guibg=#4070a0 guifg=#ffffff",

@@ -1,8 +1,11 @@
 " GUARD: {{{
 "============================================================
-" if exists('g:loaded_quickhl')
-  " finish
-" endif
+let g:quickhl_debug = 0
+let g:quickhl_dev   = 0
+
+if exists('g:loaded_quickhl') && !g:quickhl_dev
+  finish
+endif
 let g:loaded_quickhl = 1
 "for line continuation - i.e dont want C in &cpo
 let s:old_cpo = &cpo
@@ -11,7 +14,7 @@ set cpo&vim
 "}}}
 
 " ColorList: {{{
-let g:quick_hl_colors = [
+let g:quickhl_colors = [
       \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
       \ "gui=bold guibg=#a07040 guifg=#ffffff",
       \ "gui=bold guibg=#4070a0 guifg=#ffffff",
@@ -28,27 +31,21 @@ let g:quick_hl_colors = [
       \ ]
 "}}}
 
-if !exists("g:quick_hl_colors")
-    let g:quick_hl_colors = s:colors_default
-endif
-
 " Keymap: "{{{
-nnoremap <silent> <Plug>(quickhl#toggle)    :call quickhl#toggle('n')<CR>
-vnoremap <silent> <Plug>(quickhl#toggle)    :call quickhl#toggle('v')<CR>
-nnoremap <silent> <Plug>(quickhl#clear_all) :call quickhl#clear_all()<CR>
-vnoremap <silent> <Plug>(quickhl#clear_all) :call quickhl#clear_all()<CR>
+nnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('n')<CR>
+vnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('v')<CR>
+nnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
+vnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
 "}}}
 
 " Command: "{{{
-command! QuickHLList          :call quickhl#list()
-command! QuickHLClear         :call quickhl#clear_all()
-command! QuickHLShowColors    :call quickhl#show_colors()
-command! QuickHLRenewColors   :call quickhl#renew_colors()
-command! -nargs=1 QuickHLAdd  :call quickhl#add(<q-args>)
-command! -nargs=1 QuickHLDel  :call quickhl#delete(<q-args>)
+command! QuickhlList          :call quickhl#list()
+command! QuickhlReset         :call quickhl#reset()
+command! QuickhlColors        :call quickhl#colors()
+command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
+command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
 "}}}
 
-let g:quick_hl_debug = 0
 
 " FINISH: {{{
 let &cpo = s:old_cpo
