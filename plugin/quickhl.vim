@@ -42,6 +42,7 @@ vnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
 command! QuickhlList          :call quickhl#list()
 command! QuickhlReset         :call quickhl#reset()
 command! QuickhlColors        :call quickhl#colors()
+command! QuickhlRefresh       :call quickhl#refresh()
 command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
 command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
 "}}}

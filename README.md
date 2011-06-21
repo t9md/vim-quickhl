@@ -1,3 +1,7 @@
+Screen capture
+-----------------------------------------------------------------
+![quickhl.png](https://github.com/t9md/t9md/raw/master/img/quickhl.png)
+
 Command
 -----------------------------------------------------------------
 * QuickhlList           
@@ -17,7 +21,19 @@ KeyMap Example
     vmap <Space>m <Plug>(quickhl#toggle)
     nmap <Space>M <Plug>(quickhl#reset)
 
-Variables
+Highlight 't9md' on all buffers.
+-----------------------------------------------------------------
+    augroup Quickhl
+      autocmd!
+      autocmd! BufEnter * call s:init_quickhl()
+    augroup END
+
+    function! s:init_quickhl()
+        QuickhlAdd t9md
+        QuickhlRefresh
+    endfunction
+
+Change Colors
 -----------------------------------------------------------------
 If you want to change default color, set `g:quickhl_colors` array like following in your `.vimrc`.
 
@@ -27,6 +43,3 @@ If you want to change default color, set `g:quickhl_colors` array like following
           \ "gui=bold guibg=#4070a0 guifg=#ffffff",
           \ ]
 
-Screen capture
------------------------------------------------------------------
-![quickhl.png](https://github.com/t9md/t9md/raw/master/img/quickhl.png)

@@ -2,7 +2,7 @@ let s:o = {}
 let s:o.name = "QuickHL"
 function! s:o.debug(msg)"{{{
     if !g:quickhl_debug | return | endif
-    echo "[". self.name. "] " . string(a:msg)
+    echo "[". self.name. "] " . a:msg
 endfunction"}}}
 function! s:o.init()"{{{
     let self.pointer = 0
@@ -27,6 +27,18 @@ function! s:o.init_highlight()"{{{
         let cmd = "highlight " . c.hlname . " " . c.hlval
         exe cmd
     endfor
+    call self.debug("init_hl")
+endfunction"}}}
+function! s:o.refresh()"{{{
+    for c in self.colors
+        exe "syn clear " . c.hlname
+    endfor
+    call self.init_highlight()
+    for c in self.colors
+        if has_key(c, "keyword")
+            exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
+        endif
+    endfor
 endfunction"}}}
 function! s:o.show_colors()"{{{
     for c in self.colors
@@ -37,12 +49,15 @@ endfunction"}}}
 function! s:o.add(word)"{{{
     " guard duplicate entry
     if self.has_keyword(a:word)
-        call self.debug("already registerd " . a:word)
+        call self.debug("dup: " . a:word)
         return -1
+        " let c = self.get_color(a:word)
+        " exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
+        " call self.debug("hl: " . a:word)
     endif
     let idx = self.pointer
     let self.colors[idx].keyword = a:word
-    call self.debug("newly registerd " . a:word)
+    call self.debug("new: " . a:word)
     call self.inc_pointer()
 
     let c = self.colors[idx]
@@ -52,7 +67,7 @@ function! s:o.del(word)"{{{
     for idx in range(len(self.colors))
         let c = self.colors[idx]
         if has_key(c, "keyword") && c.keyword == a:word
-            call self.debug("delete " . a:word)
+            call self.debug("del: " . a:word)
             let cmd = "syntax clear " . c.hlname
             exe cmd
             call remove(c, "keyword")
@@ -75,6 +90,15 @@ function! s:o.has_keyword(word)"{{{
         endif
     endfor
     return 0
+endfunction"}}}
+function! s:o.get_color(word)"{{{
+    for num in range(len(self.colors))
+        let c = self.colors[num]
+        if has_key(c, "keyword") && c.keyword == a:word
+            return c
+        endif
+    endfor
+    return -1
 endfunction"}}}
 function! s:o.reset()"{{{
     for c in self.colors
@@ -122,8 +146,8 @@ endfunction"}}}
 function! quickhl#colors()"{{{
     call s:o.show_colors()
 endfunction"}}}
-function! quickhl#renew_colors()"{{{
-    call s:o.init_color()
+function! quickhl#refresh()"{{{
+    call s:o.refresh()
 endfunction"}}}
 
 " vim: set sw=4 sts=4 et fdm=marker:
