@@ -86,12 +86,9 @@ function! s:o.do_by_num(num)"{{{
 endfunction"}}}
 
 function! s:o.list() "{{{
-    for num in range(len(self.keywords))
-        if !has_key(self.keywords, num)
-            continue
-        endif
+    for num in sort(keys(self.keywords))
         exe 'echohl QuickMatch' . num
-        echo num self.keywords[num]
+        echo self.keywords[num]
         echohl None
     endfor
 endfunction"}}}
