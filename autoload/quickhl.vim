@@ -87,6 +87,9 @@ endfunction"}}}
 
 function! s:o.list() "{{{
     for num in range(len(self.keywords))
+        if !has_key(self.keywords, num)
+            continue
+        endif
         exe 'echohl QuickMatch' . num
         echo num self.keywords[num]
         echohl None
