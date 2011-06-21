@@ -1,3 +1,4 @@
+let s:def_str = "THE_WORD_ALWAYS_HIGHLIGTED_IS_THE_WORD_YOUD_NEVER_USE"
 let s:o = {}
 let s:o.name = "QuickHL"
 function! s:o.debug(msg)"{{{
@@ -19,26 +20,30 @@ function! s:o.read_colors(list)"{{{
         call add(self.colors, {
                     \ "hlname" : "QuickHL".idx,
                     \ "hlval" : a:list[idx],
+                    \ "keyword" : s:def_str,
                     \ })
     endfor
 endfunction"}}}
 function! s:o.init_highlight()"{{{
     for c in self.colors
-        let cmd = "highlight " . c.hlname . " " . c.hlval
-        exe cmd
+        exe  "highlight " . c.hlname . " " . c.hlval
     endfor
     call self.debug("init_hl")
 endfunction"}}}
-function! s:o.refresh()"{{{
+function! s:o.syn_clear()"{{{
     for c in self.colors
         exe "syn clear " . c.hlname
     endfor
-    call self.init_highlight()
+endfunction"}}}
+function! s:o.highlight_all()"{{{
     for c in self.colors
-        if has_key(c, "keyword")
-            call self.highlight(c)
-        endif
+        call self.highlight(c)
     endfor
+endfunction"}}}
+function! s:o.refresh()"{{{
+    call self.syn_clear()
+    call self.init_highlight()
+    call self.highlight_all()
 endfunction"}}}
 function! s:o.highlight(c)"{{{
     let c = a:c
@@ -47,8 +52,7 @@ function! s:o.highlight(c)"{{{
 endfunction"}}}
 function! s:o.show_colors()"{{{
     for c in self.colors
-        let cmd = "highlight " . c.hlname
-        exe cmd
+        exe "highlight " . c.hlname
     endfor
 endfunction"}}}
 function! s:o.add(word)"{{{
@@ -61,24 +65,19 @@ function! s:o.add(word)"{{{
     let self.colors[idx].keyword = a:word
     call self.debug("new: " . a:word)
     call self.inc_pointer()
-
-    let c = self.colors[idx]
-    call self.highlight(c)
+    call self.refresh()
 endfunction"}}}
 function! s:o.del(word)"{{{
-    for idx in range(len(self.colors))
-        let c = self.colors[idx]
-        if has_key(c, "keyword") && c.keyword == a:word
-            call self.debug("del: " . a:word)
-            let cmd = "syntax clear " . c.hlname
-            exe cmd
-            call remove(c, "keyword")
+    for c in self.colors
+        if c.keyword == a:word
+            let c.keyword = s:def_str
         endif
     endfor
+    call s:o.refresh()
 endfunction"}}}
 function! s:o.list()"{{{
     for c in self.colors
-        if !has_key(c, "keyword") | continue | endif
+        if c.keyword == s:def_str | continue | endif
         let cmd =  "echohl ". c.hlname
         exe cmd
         echo c.keyword
@@ -87,25 +86,14 @@ function! s:o.list()"{{{
 endfunction"}}}
 function! s:o.has_keyword(word)"{{{
     for c in self.colors
-        if has_key(c, "keyword") && c.keyword == a:word
+        if c.keyword == a:word
             return 1
         endif
     endfor
     return 0
 endfunction"}}}
-function! s:o.get_color(word)"{{{
-    for num in range(len(self.colors))
-        let c = self.colors[num]
-        if has_key(c, "keyword") && c.keyword == a:word
-            return c
-        endif
-    endfor
-    return -1
-endfunction"}}}
 function! s:o.reset()"{{{
-    for c in self.colors
-        exe "syn clear " . c.hlname
-    endfor
+    call self.syn_clear()
     call self.init()
 endfunction"}}}
 function! s:o.toggle(word)"{{{
