@@ -36,9 +36,14 @@ function! s:o.refresh()"{{{
     call self.init_highlight()
     for c in self.colors
         if has_key(c, "keyword")
-            exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
+            call self.highlight(c)
         endif
     endfor
+endfunction"}}}
+function! s:o.highlight(c)"{{{
+    let c = a:c
+    let keyword = escape(c.keyword, "'")
+    exe "syntax match " c.hlname . " '" . keyword . "' containedin=ALL"
 endfunction"}}}
 function! s:o.show_colors()"{{{
     for c in self.colors
@@ -51,9 +56,6 @@ function! s:o.add(word)"{{{
     if self.has_keyword(a:word)
         call self.debug("dup: " . a:word)
         return -1
-        " let c = self.get_color(a:word)
-        " exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
-        " call self.debug("hl: " . a:word)
     endif
     let idx = self.pointer
     let self.colors[idx].keyword = a:word
@@ -61,7 +63,7 @@ function! s:o.add(word)"{{{
     call self.inc_pointer()
 
     let c = self.colors[idx]
-    exe "syntax match " c.hlname . " '" . c.keyword . "' containedin=ALL"
+    call self.highlight(c)
 endfunction"}}}
 function! s:o.del(word)"{{{
     for idx in range(len(self.colors))
