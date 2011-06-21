@@ -4,15 +4,15 @@ Screen capture
 
 Command
 -----------------------------------------------------------------
-* QuickhlList           
+* :QuickhlList  
     Show registerd keyword list with color.
-* QuickhlReset
+* :QuickhlReset  
     Reset all.
-* QuickhlShowColors
+* :QuickhlShowColors  
     Check colors.
-* QuickhlAdd  word
+* :QuickhlAdd  word  
     Add word.
-* QuickhlDel  word
+* :QuickhlDel  word  
     Delete word.
 
 KeyMap Example
