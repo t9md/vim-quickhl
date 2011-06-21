@@ -1,10 +1,15 @@
 Command
 -----------------------------------------------------------------
-* QuickhlList           Show registerd keyword list with color.
-* QuickhlReset          Reset all.
-* QuickhlShowColors     Check colors.
-* QuickhlAdd  word      Add word.
-* QuickhlDel  word      Delete word.
+* QuickhlList           
+    Show registerd keyword list with color.
+* QuickhlReset
+    Reset all.
+* QuickhlShowColors
+    Check colors.
+* QuickhlAdd  word
+    Add word.
+* QuickhlDel  word
+    Delete word.
 
 KeyMap Example
 -----------------------------------------------------------------
