@@ -6,54 +6,52 @@ function! s:o.debug(msg)"{{{
     echo "[". self.name. "] " . a:msg
 endfunction"}}}
 function! s:o.init()"{{{
-    let self.pointer = 0
+    let  self.idx = 0
+    let  self.kwlist = {}
     call s:o.read_colors( g:quickhl_colors )
     call s:o.init_highlight()
-endfunction"}}}
-function! s:o.inc_pointer()"{{{
-    let self.pointer = (self.pointer + 1) % len(self.colors)
-    return self.pointer
-endfunction"}}}
-function! s:o.read_colors(list)"{{{
-    let self.colors = []
-    for idx in range(len(a:list))
-        call add(self.colors, {
-                    \ "hlname" : "QuickHL".idx,
-                    \ "hlval" : a:list[idx],
-                    \ "keyword" : s:def_str,
-                    \ })
-    endfor
-endfunction"}}}
-function! s:o.init_highlight()"{{{
-    for c in self.colors
-        exe  "highlight " . c.hlname . " " . c.hlval
-    endfor
-    call self.debug("init_hl")
-endfunction"}}}
-function! s:o.syn_clear()"{{{
-    for c in self.colors
-        exe "syn clear " . c.hlname
-    endfor
-endfunction"}}}
-function! s:o.highlight_all()"{{{
-    for c in self.colors
-        call self.highlight(c)
-    endfor
 endfunction"}}}
 function! s:o.refresh()"{{{
     call self.syn_clear()
     call self.init_highlight()
     call self.highlight_all()
 endfunction"}}}
+function! s:o.reset()"{{{
+    call self.syn_clear()
+    call self.init()
+endfunction"}}}
+function! s:o.read_colors(list)"{{{
+    let self.colors = map(copy(a:list),
+                \ '{ "hlname": "Quickhl".v:key, "hlval": v:val, "keyword": s:def_str }')
+endfunction"}}}
+function! s:o.init_highlight()"{{{
+    call self.each_color_exe('"highlight " . c.hlname . " " . c.hlval')
+endfunction"}}}
+
+function! s:o.inc_idx()"{{{
+    let self.idx = (self.idx + 1) % len(self.colors)
+endfunction"}}}
+function! s:o.each_color_exe(exp)"{{{
+    for c in self.colors
+        exe eval(a:exp)
+    endfor
+endfunction"}}}
+function! s:o.each_color_call(f)"{{{
+    for c in self.colors
+        call call(a:f, [c], self)
+    endfor
+endfunction"}}}
+function! s:o.syn_clear()"{{{
+    call self.each_color_exe('"syn clear " . c.hlname')
+endfunction"}}}
+function! s:o.highlight_all()"{{{
+    call self.each_color_call(self.highlight)
+endfunction"}}}
 function! s:o.highlight(c)"{{{
-    let c = a:c
-    let keyword = escape(c.keyword, "'")
-    exe "syntax match " c.hlname . " '" . keyword . "' containedin=ALL"
+    exe "syntax match " a:c.hlname . " '" . escape(a:c.keyword, "'") . "' containedin=ALL"
 endfunction"}}}
 function! s:o.show_colors()"{{{
-    for c in self.colors
-        exe "highlight " . c.hlname
-    endfor
+    call self.each_color_exe('"highlight " . c.hlname')
 endfunction"}}}
 function! s:o.add(word)"{{{
     " guard duplicate entry
@@ -61,33 +59,29 @@ function! s:o.add(word)"{{{
         call self.debug("dup: " . a:word)
         return -1
     endif
-    let idx = self.pointer
-    let self.colors[idx].keyword = a:word
+    let  self.colors[self.idx].keyword = a:word
+    let  self.kwlist[a:word] = self.idx
     call self.debug("new: " . a:word)
-    call self.inc_pointer()
+    call self.inc_idx()
     call self.refresh()
 endfunction"}}}
 function! s:o.del(word)"{{{
-    for c in self.colors
-        if c.keyword == a:word
-            let c.keyword = s:def_str
-        endif
-    endfor
-    call s:o.refresh()
+    let idx = get(self.kwlist, a:word, -1)
+    if idx != -1
+        let self.colors[idx].keyword = s:def_str
+        call remove(self.kwlist, a:word)
+        call self.debug("del: " . a:word)
+        call s:o.refresh()
+    endif
 endfunction"}}}
 function! s:o.list()"{{{
-    for c in filter(copy(self.colors), 'v:val.keyword != s:def_str ')
-        exe  "echohl ". c.hlname
-        echo c.keyword
-        echohl None
+    for idx in values(kwlist)
+        let c = self.colors[idx]
+        exe  "echohl ". c.hlname|echo c.keyword|echohl None
     endfor
 endfunction"}}}
 function! s:o.has_keyword(word)"{{{
-    return len(filter(copy(self.colors), 'v:val.keyword == a:word')) != 0
-endfunction"}}}
-function! s:o.reset()"{{{
-    call self.syn_clear()
-    call self.init()
+    return has_key(self.kwlist, a:word)
 endfunction"}}}
 function! s:o.toggle(word)"{{{
     if !self.has_keyword(a:word)
