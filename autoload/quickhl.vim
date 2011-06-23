@@ -75,7 +75,7 @@ function! s:o.del(word)"{{{
     endif
 endfunction"}}}
 function! s:o.list()"{{{
-    for idx in sort(values(kwlist))
+    for idx in sort(values(self.kwlist))
         let c = self.colors[idx]
         exe  "echohl ". c.hlname|echo c.keyword|echohl None
     endfor
