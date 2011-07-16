@@ -1,7 +1,7 @@
 " GUARD: {{{
 "============================================================
-let g:quickhl_debug = 1
-let g:quickhl_dev   = 1
+let g:quickhl_debug = 0
+let g:quickhl_dev   = 0
 
 if exists('g:loaded_quickhl') && !g:quickhl_dev
   finish
