@@ -1,7 +1,7 @@
 " GUARD: {{{
 "============================================================
-let g:quickhl_debug = 0
-let g:quickhl_dev   = 0
+let g:quickhl_debug = 1
+let g:quickhl_dev   = 1
 
 if exists('g:loaded_quickhl') && !g:quickhl_dev
   finish
@@ -14,21 +14,23 @@ set cpo&vim
 "}}}
 
 " ColorList: {{{
-let g:quickhl_colors = [
-      \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
-      \ "gui=bold guibg=#a07040 guifg=#ffffff",
-      \ "gui=bold guibg=#4070a0 guifg=#ffffff",
-      \ "gui=bold guibg=#40a070 guifg=#ffffff",
-      \ "gui=bold guibg=#70a040 guifg=#ffffff",
-      \ "gui=bold guibg=#0070e0 guifg=#ffffff",
-      \ "gui=bold guibg=#007020 guifg=#ffffff",
-      \ "gui=bold guibg=#d4a00d guifg=#ffffff",
-      \ "gui=bold guibg=#06287e guifg=#ffffff",
-      \ "gui=bold guibg=#5b3674 guifg=#ffffff",
-      \ "gui=bold guibg=#4c8f2f guifg=#ffffff",
-      \ "gui=bold guibg=#1060a0 guifg=#ffffff",
-      \ "gui=bold guibg=#a0b0c0 guifg=black",
-      \ ]
+if !exists("g:quickhl_colors")
+    let g:quickhl_colors = [
+                \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
+                \ "gui=bold guibg=#a07040 guifg=#ffffff",
+                \ "gui=bold guibg=#4070a0 guifg=#ffffff",
+                \ "gui=bold guibg=#40a070 guifg=#ffffff",
+                \ "gui=bold guibg=#70a040 guifg=#ffffff",
+                \ "gui=bold guibg=#0070e0 guifg=#ffffff",
+                \ "gui=bold guibg=#007020 guifg=#ffffff",
+                \ "gui=bold guibg=#d4a00d guifg=#ffffff",
+                \ "gui=bold guibg=#06287e guifg=#ffffff",
+                \ "gui=bold guibg=#5b3674 guifg=#ffffff",
+                \ "gui=bold guibg=#4c8f2f guifg=#ffffff",
+                \ "gui=bold guibg=#1060a0 guifg=#ffffff",
+                \ "gui=bold guibg=#a0b0c0 guifg=black",
+                \ ]
+endif
 "}}}
 
 " Keymap: "{{{

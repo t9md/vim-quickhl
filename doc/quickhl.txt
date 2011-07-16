@@ -14,7 +14,8 @@ KeyMap Example~
 ------------------------------------------------------------------------------
 >
     nmap <Space>m <Plug>(quickhl#toggle)
-    vmap <Space>m <Plug>(quickhl#toggle)
+    " xmap is better than vmap
+    xmap <Space>m <Plug>(quickhl#toggle)
     nmap <Space>M <Plug>(quickhl#reset)
 <
 Variables~

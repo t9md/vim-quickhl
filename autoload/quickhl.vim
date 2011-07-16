@@ -8,8 +8,8 @@ endfunction"}}}
 function! s:o.init()"{{{
     let  self.idx = 0
     let  self.kwlist = {}
-    call s:o.read_colors( g:quickhl_colors )
-    call s:o.init_highlight()
+    call self.read_colors( g:quickhl_colors )
+    call self.init_highlight()
 endfunction"}}}
 function! s:o.refresh()"{{{
     call self.syn_clear()
@@ -75,13 +75,16 @@ function! s:o.del(word)"{{{
     endif
 endfunction"}}}
 function! s:o.list()"{{{
-    for idx in sort(values(self.kwlist))
-        let c = self.colors[idx]
+    for c in self.colors
+        if c.keyword == s:def_str
+            continue
+        endif
         exe  "echohl ". c.hlname|echo c.keyword|echohl None
     endfor
 endfunction"}}}
 function! s:o.has_keyword(word)"{{{
-    return has_key(self.kwlist, a:word)
+    let keywords = map(deepcopy(self.colors), 'v:val.keyword')
+    return index(keywords, a:word) != -1 
 endfunction"}}}
 function! s:o.toggle(word)"{{{
     if !self.has_keyword(a:word)
