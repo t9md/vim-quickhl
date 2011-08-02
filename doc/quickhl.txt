@@ -10,13 +10,22 @@ Command~
 * QuickhlAdd  word      Add word.
 * QuickhlDel  word      Delete word.
 
+* QuickhlMatch          highlight |<cword>| with |:match|
+* QuickhlMatchClear     clear match
+* QuickhlMatchAuto      auto-|:match|each time |CursorMoved|
+* QuickhlMatchManual    quit auto- |:match| mode
+
 KeyMap Example~
 ------------------------------------------------------------------------------
+xmap is better than vmap
 >
     nmap <Space>m <Plug>(quickhl#toggle)
-    " xmap is better than vmap
     xmap <Space>m <Plug>(quickhl#toggle)
     nmap <Space>M <Plug>(quickhl#reset)
+    xmap <Space>M <Plug>(quickhl#reset)
+
+    nmap <Space>j <Plug>(quickhl#match)
+    xmap <Space>j <Plug>(quickhl#match)
 <
 Variables~
 ------------------------------------------------------------------------------

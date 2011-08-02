@@ -1,9 +1,8 @@
 " GUARD: {{{
 "============================================================
 let g:quickhl_debug = 0
-let g:quickhl_dev   = 0
 
-if exists('g:loaded_quickhl') && !g:quickhl_dev
+if exists('g:loaded_quickhl') && exists('g:quickhl_dev') && !g:quickhl_dev
   finish
 endif
 let g:loaded_quickhl = 1
@@ -38,6 +37,9 @@ nnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('n')<CR>
 vnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('v')<CR>
 nnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
 vnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
+
+nnoremap <silent> <Plug>(quickhl#match) :call quickhl#match('n','toggle')<CR>
+vnoremap <silent> <Plug>(quickhl#match) :call quickhl#match('v','toggle')<CR>
 "}}}
 
 " Command: "{{{
@@ -47,9 +49,27 @@ command! QuickhlColors        :call quickhl#colors()
 command! QuickhlRefresh       :call quickhl#refresh()
 command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
 command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
+
+command! QuickhlMatch         :call quickhl#match('n',"on")
+command! QuickhlMatchClear    :call quickhl#match('n',"clear")
+command! QuickhlMatchAuto     :call <SID>quickhl_match_auto()
+command! QuickhlMatchManual   :call <SID>quickhl_match_manual()
+
 "}}}
 
+" AutoCmd: {{{
+function! s:quickhl_match_auto()
+  augroup QuickhlMatch
+      autocmd CursorMoved <buffer> call quickhl#match('n',"on")
+  augroup end
+endfunction
 
+function! s:quickhl_match_manual()
+  augroup QuickhlMatch
+      autocmd!
+  augroup end
+endfunction
+"}}}
 " FINISH: {{{
 let &cpo = s:old_cpo
 "}}}

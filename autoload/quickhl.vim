@@ -96,8 +96,7 @@ endfunction"}}}
 
 call s:o.init()
 
-" PublicInterface:
-function! quickhl#toggle(mode)"{{{
+function! s:extract_pattern(mode)
     if a:mode == 'v'
         normal `<
         let s = col('.') - 1
@@ -108,8 +107,33 @@ function! quickhl#toggle(mode)"{{{
     else
         let pat = expand('<cword>')
     endif
-    let pat = escape(pat, '/')
-    call s:o.toggle(pat)
+    return escape(pat, '/')
+endfunction
+
+" PublicInterface:
+function! quickhl#toggle(mode)"{{{
+    call s:o.toggle(s:extract_pattern(a:mode))
+endfunction"}}}
+function! quickhl#match(mode, action)"{{{
+    if a:action == 'clear'
+        silent! match none
+        return
+    endif
+
+    let pattern = s:extract_pattern(a:mode)
+
+    if exists('b:quickmatch_pat') &&
+                \ b:quickmatch_pat == pattern &&
+                \ a:action == 'toggle'
+        silent! match none
+        unlet b:quickmatch_pat
+        return
+    endif
+    let b:quickmatch_pat = pattern
+
+    " highlight QuickhlMatch gui=underline guisp=Cyan
+    highlight QuickhlMatch gui=undercurl guisp=Cyan
+    exe "match QuickhlMatch /". b:quickmatch_pat . "/"
 endfunction"}}}
 function! quickhl#list()"{{{
     call s:o.list()
