@@ -8,6 +8,7 @@ endfunction"}}}
 function! s:o.init()"{{{
     let  self.idx = 0
     let  self.kwlist = {}
+    let  self.match_ids = []
     call self.read_colors( g:quickhl_colors )
     call self.init_highlight()
 endfunction"}}}
@@ -43,12 +44,23 @@ function! s:o.each_color_call(f)"{{{
 endfunction"}}}
 function! s:o.syn_clear()"{{{
     call self.each_color_exe('"syn clear " . c.hlname')
+    call self.matchdel_all()
 endfunction"}}}
+
+function! s:o.matchdel_all()"{{{
+    call clearmatches()
+    " for id in self.match_ids
+        " call matchdelete(id)
+    " endfor
+endfunction"}}}
+
 function! s:o.highlight_all()"{{{
     call self.each_color_call(self.highlight)
 endfunction"}}}
 function! s:o.highlight(c)"{{{
-    exe "syntax match " a:c.hlname . " '" . escape(a:c.keyword, "'") . "' containedin=ALL"
+    " exe "syntax match " a:c.hlname . " '" . escape(a:c.keyword, "'") . "' containedin=ALL"
+    let id = matchadd(a:c.hlname, escape(a:c.keyword, "'"))
+    call add(self.match_ids, id)
 endfunction"}}}
 function! s:o.show_colors()"{{{
     call self.each_color_exe('"highlight " . c.hlname')
