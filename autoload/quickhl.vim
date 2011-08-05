@@ -108,6 +108,7 @@ endfunction"}}}
 
 call s:o.init()
 
+let s:metachar = '\/~.'
 function! s:extract_pattern(mode)
     if a:mode == 'v'
         normal `<
@@ -119,7 +120,7 @@ function! s:extract_pattern(mode)
     else
         let pat = expand('<cword>')
     endif
-    return escape(pat, '/')
+    return escape(pat, s:metachar)
 endfunction
 
 " PublicInterface:
