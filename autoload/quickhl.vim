@@ -64,7 +64,17 @@ function! s:o.init_highlight() "{{{
     let cmd = 'highlight ' . color.name . ' ' . color.val
     call s:exe(cmd)
   endfor
+  call self.inject_keywords()
 endfunction "}}}
+
+function! s:o.inject_keywords()
+  let keywords = get(g:quickhl_keywords, &filetype, {})
+  if !empty(keywords)
+    for keyword in keywords
+      call self.add(keyword)
+    endfor
+  endif
+endfunction
 
 function! s:our_match() "{{{
   return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
@@ -85,6 +95,7 @@ function! s:o.reset() "{{{
   for color in self.colors
     let color.pattern = ""
   endfor
+  call self.inject_keywords()
   let lazyredraw_orig = &lazyredraw
   set lazyredraw
   let winnum = winnr()
