@@ -22,7 +22,7 @@ endfunction "}}}
   " return pat
 " endfunction "}}}
 
-let s:metachar = '\/~. *^[''$'
+let s:metachar = '\/~ .*^[''$'
 function! s:escape(pattern) "{{{
   return escape(a:pattern,s:metachar)
 endfunction "}}}
@@ -85,9 +85,13 @@ function! s:o.reset() "{{{
   for color in self.colors
     let color.pattern = ""
   endfor
+  let lazyredraw_orig = &lazyredraw
+  set lazyredraw
   let winnum = winnr()
   exe "windo call <SID>clear_match()"
   exe winnum . "wincmd w"
+  let &lazyredraw = lazyredraw_orig
+  redraw
 endfunction "}}}
 
 function! s:o.refresh() "{{{
@@ -141,7 +145,7 @@ function! s:o.del(word) "{{{
   if s:has_match(a:word)
     call s:decho("del: " . a:word)
     for color in self.colors
-      if color.pattern == s:escape(a:word)
+      if color.pattern == a:word
         let color.pattern = ""
       endif
     endfor
