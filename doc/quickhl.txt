@@ -1,34 +1,82 @@
-quickhl.vim~
+*quickhl.txt* Quickly highlight multiple word.
+						      
+						      
+       .oooooo.                o8o          oooo       oooo       oooo  
+      d8P'  `Y8b               `"'          `888       `888       `888  
+     888      888  oooo  oooo oooo  .ooooo.  888  oooo  888 .oo.   888  
+     888      888  `888  `888 `888 d88' `"Y8 888 .8P'   888P"Y88b  888  >
+     888      888   888   888  888 888       888888.    888   888  888  
+     `88b    d88b   888   888  888 888   .o8 888 `88b.  888   888  888  
+      `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o <
+
+
+Version: 0.2
+Author : t9md <taqumd@gmail.com>
+GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
-https://github.com/t9md/vim-quickhl
+CONTENTS					*quickhl-contents*
 
-Command~
-------------------------------------------------------------------------------
-* QuickhlList           Show registerd keyword list with color.
-* QuickhlReset          Reset all.
-* QuickhlColors         Show colors.
-* QuickhlAdd  word      Add word.
-* QuickhlDel  word      Delete word.
+Introduction				    |quickhl-introduction|
+Mapping					    |quickhl-mapping|
+Commands				    |quickhl-commands|
+Variables				    |quickhl-variables|
+Configuration Examples			    |quickhl-examples|
+Use Case				    |quickhl-usecase|
+Practice				    |quickhl-practice|
+Bug     				    |quickhl-bug|
+Changelog				    |quickhl-changelog|
 
-* QuickhlMatch          highlight |<cword>| with |:match|
-* QuickhlMatchClear     clear match
-* QuickhlMatchAuto      auto-|:match|each time |CursorMoved|
-* QuickhlMatchManual    quit auto- |:match| mode
+==============================================================================
+INTRODUCTION				      	*quickhl-introduction*
 
-KeyMap Example~
-------------------------------------------------------------------------------
-xmap is better than vmap
+
+==============================================================================
+MAPPINGS					*quickhl-mappings*
+
+n <Plug>(quickhl-toggle)
+v <Plug>(quickhl-toggle)
+    highlight |<cword>| or visually selected text
+
+n <Plug>(quickhl-reset)
+v <Plug>(quickhl-reset)
+    clear all quick-highlight
+
+n <Plug>(quickhl-match)
+v <Plug>(quickhl-match)
+    undercurl on |<cword>| with |:match|
+==============================================================================
+COMMANDS						*quickhl-commands*
+
+:QuickhlList           Show registerd keyword list with color.
+:QuickhlReset          Reset all.
+:QuickhlColors         Show colors.
+:QuickhlReloadColors   reload color table from |g:quickhl_colors|.
+:QuickhlAdd  word      Add word.
+:QuickhlDel  word      Delete word.
+
+:QuickhlMatch          highlight |<cword>| with |:match|
+:QuickhlMatchClear     clear match
+:QuickhlMatchAuto      {auto-match} each |CursorMoved|
+:QuickhlMatchNoAuto    quit {auto-match} mode
+
+==============================================================================
+VARIABLES						*quickhl-variables*
+
+g:quickhl_colors
+    array of color's definition used to quick-highlight.
+    see |quickhl-examples|
+
+==============================================================================
+CONFIGURATION EXAMPLE                               *quickhl-examples*
+
 >
-    nmap <Space>m <Plug>(quickhl#toggle)
-    xmap <Space>m <Plug>(quickhl#toggle)
-    nmap <Space>M <Plug>(quickhl#reset)
-    xmap <Space>M <Plug>(quickhl#reset)
+    nmap <Space>m <Plug>(quickhl-toggle)
+    xmap <Space>m <Plug>(quickhl-toggle)
+    nmap <Space>M <Plug>(quickhl-reset)
+    xmap <Space>M <Plug>(quickhl-reset)
 
-    nmap <Space>j <Plug>(quickhl#match)
-    xmap <Space>j <Plug>(quickhl#match)
+    nmap <Space>j <Plug>(quickhl-match)
 <
-Variables~
-------------------------------------------------------------------------------
 If you want to change default color, set 'g:quickhl_colors' array like following
 in your '.vimrc'.
 >
@@ -38,4 +86,12 @@ in your '.vimrc'.
           \ "gui=bold guibg=#4070a0 guifg=#ffffff",
           \ ]
 <
-vim: syntax=help nospell
+==============================================================================
+CHANGELOG						*quickhl-changelog*
+
+2011-08-17: v0.2
+	- completely re-writen to use |match()| other than |:syntax|.
+2011-06-21: v0.1
+	- initial version
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:

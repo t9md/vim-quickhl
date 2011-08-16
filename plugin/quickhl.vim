@@ -1,66 +1,79 @@
+"=============================================================================
+" File: quickhl.vim
+" Author: t9md <taqumd@gmail.com>
+" WebPage: http://github.com/t9md/quickhl.vim
+" License: BSD
+" Version: 0.7
+"=============================================================================
+
 " GUARD: {{{
 "============================================================
-let g:quickhl_debug = 0
+if exists('g:quickhl_dev')
+  unlet! g:loaded_quickhl
+endif
+if !exists('g:quickhl_debug')
+  let g:quickhl_debug = 0
+endif
 
-if exists('g:loaded_quickhl') && exists('g:quickhl_dev') && !g:quickhl_dev
+if exists('g:loaded_quickhl')
   finish
 endif
 let g:loaded_quickhl = 1
-"for line continuation - i.e dont want C in &cpo
+
 let s:old_cpo = &cpo
 set cpo&vim
-
 "}}}
 
 " ColorList: {{{
 if !exists("g:quickhl_colors")
-    let g:quickhl_colors = [
-                \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
-                \ "gui=bold guibg=#a07040 guifg=#ffffff",
-                \ "gui=bold guibg=#4070a0 guifg=#ffffff",
-                \ "gui=bold guibg=#40a070 guifg=#ffffff",
-                \ "gui=bold guibg=#70a040 guifg=#ffffff",
-                \ "gui=bold guibg=#0070e0 guifg=#ffffff",
-                \ "gui=bold guibg=#007020 guifg=#ffffff",
-                \ "gui=bold guibg=#d4a00d guifg=#ffffff",
-                \ "gui=bold guibg=#06287e guifg=#ffffff",
-                \ "gui=bold guibg=#5b3674 guifg=#ffffff",
-                \ "gui=bold guibg=#4c8f2f guifg=#ffffff",
-                \ "gui=bold guibg=#1060a0 guifg=#ffffff",
-                \ "gui=bold guibg=#a0b0c0 guifg=black",
-                \ ]
+  let g:quickhl_colors = [
+        \ "gui=bold ctermfg=16  ctermbg=153 guifg=#ffffff guibg=#0a7383",
+        \ "gui=bold ctermfg=7   ctermbg=1   guibg=#a07040 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=2   guibg=#4070a0 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=3   guibg=#40a070 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=4   guibg=#70a040 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=5   guibg=#0070e0 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=6   guibg=#007020 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=21  guibg=#d4a00d guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=22  guibg=#06287e guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=45  guibg=#5b3674 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=16  guibg=#4c8f2f guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=50  guibg=#1060a0 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=56  guibg=#a0b0c0 guifg=black",
+        \ ]
 endif
 "}}}
 
-" Keymap: "{{{
-nnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('n')<CR>
-vnoremap <silent> <Plug>(quickhl#toggle) :call quickhl#toggle('v')<CR>
-nnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
-vnoremap <silent> <Plug>(quickhl#reset)  :call quickhl#reset()<CR>
+" Keymap: {{{
+nnoremap <silent> <Plug>(quickhl-toggle) :call quickhl#toggle('n')<CR>
+vnoremap <silent> <Plug>(quickhl-toggle) :call quickhl#toggle('v')<CR>
 
-nnoremap <silent> <Plug>(quickhl#match) :call quickhl#match('n','toggle')<CR>
-vnoremap <silent> <Plug>(quickhl#match) :call quickhl#match('v','toggle')<CR>
+nnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
+vnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
+
+nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match_toggle('n')<CR>
+vnoremap <silent> <Plug>(quickhl-match) :call quickhl#match_toggle('v')<CR>
 "}}}
 
-" Command: "{{{
+" Command: {{{
 command! QuickhlList          :call quickhl#list()
+command! QuickhlDump          :call quickhl#dump()
 command! QuickhlReset         :call quickhl#reset()
 command! QuickhlColors        :call quickhl#colors()
-command! QuickhlRefresh       :call quickhl#refresh()
+command! QuickhlReloadColors  :call quickhl#init_highlight()
 command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
 command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
 
 command! QuickhlMatch         :call quickhl#match('n',"on")
 command! QuickhlMatchClear    :call quickhl#match('n',"clear")
 command! QuickhlMatchAuto     :call <SID>quickhl_match_auto()
-command! QuickhlMatchManual   :call <SID>quickhl_match_manual()
-
+command! QuickhlMatchNoAuto   :call <SID>quickhl_match_manual()
 "}}}
 
 " AutoCmd: {{{
 function! s:quickhl_match_auto()
   augroup QuickhlMatch
-      autocmd CursorMoved <buffer> call quickhl#match('n',"on")
+      autocmd! CursorMoved <buffer> call quickhl#match('n',"on")
   augroup end
 endfunction
 
@@ -69,8 +82,20 @@ function! s:quickhl_match_manual()
       autocmd!
   augroup end
 endfunction
+
+augroup QuickhlHL
+  autocmd!
+  autocmd WinEnter * call quickhl#refresh()
+  autocmd TabEnter *
+        \   if exists(':Tcolorscheme')
+        \ |   call quickhl#init_highlight()
+        \ | endif
+  autocmd! ColorScheme * call quickhl#init_highlight()
+augroup end
+
 "}}}
+
 " FINISH: {{{
 let &cpo = s:old_cpo
 "}}}
-" vim: set sw=4 sts=4 et fdm=marker:
+" vim: set fdm=marker:

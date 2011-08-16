@@ -1,170 +1,247 @@
-let s:def_str = "THE_WORD_ALWAYS_HIGHLIGTED_IS_THE_WORD_YOUD_NEVER_USE"
+" Utility: {{{
+
+"copy & paste from tyru's open-browser.vim
+function! s:get_selected_text() "{{{
+  let save_z = getreg('z', 1)
+  let save_z_type = getregtype('z')
+  try
+    silent normal! gv"zy
+    return substitute(@z,"\n.*",'','')
+  finally
+    call setreg('z', save_z, save_z_type)
+  endtry
+endfunction "}}}
+
+" function! s:get_selected_text() "{{{
+  " normal `<
+  " let s = col('.') - 1
+  " normal `>
+  " let e = col('.') - 1
+  " let line = getline('.')
+  " let pat = line[s : e]
+  " return pat
+" endfunction "}}}
+
+let s:metachar = '\/~. *^[''$'
+function! s:escape(pattern) "{{{
+  return escape(a:pattern,s:metachar)
+endfunction "}}}
+
+function! s:read_colors(list) "{{{
+  return map(copy(a:list),'{ 
+        \ "name": "Quickhl" . v:key,
+        \ "val": v:val,
+        \ "pattern": "",
+        \ }')
+endfunction "}}}
+
+function! s:decho(msg) "{{{
+  if g:quickhl_debug
+    echo "[debug] ". a:msg
+  endif
+endfunction "}}}
+
+function! s:exe(cmd) "{{{
+  call s:decho("[cmd] " . a:cmd)
+  exe a:cmd
+endfunction "}}}
+" }}}
+
+" MAIN: {{{
 let s:o = {}
-let s:o.name = "QuickHL"
-function! s:o.debug(msg)"{{{
-    if !g:quickhl_debug | return | endif
-    echo "[". self.name. "] " . a:msg
-endfunction"}}}
-function! s:o.init()"{{{
-    let  self.idx = 0
-    let  self.kwlist = {}
-    let  self.match_ids = []
-    call self.read_colors( g:quickhl_colors )
-    call self.init_highlight()
-endfunction"}}}
-function! s:o.refresh()"{{{
-    call self.syn_clear()
-    call self.init_highlight()
-    call self.highlight_all()
-endfunction"}}}
-function! s:o.reset()"{{{
-    call self.syn_clear()
-    call self.init()
-endfunction"}}}
-function! s:o.read_colors(list)"{{{
-    let self.colors = map(copy(a:list),
-                \ '{ "hlname": "Quickhl".v:key, "hlval": v:val, "keyword": s:def_str }')
-endfunction"}}}
-function! s:o.init_highlight()"{{{
-    call self.each_color_exe('"highlight " . c.hlname . " " . c.hlval')
-endfunction"}}}
+function! s:o.dump() "{{{
+  echo PP(self)
+endfunction "}}}
 
-function! s:o.inc_idx()"{{{
-    let self.idx = (self.idx + 1) % len(self.colors)
-endfunction"}}}
-function! s:o.each_color_exe(exp)"{{{
-    for c in self.colors
-        exe eval(a:exp)
-    endfor
-endfunction"}}}
-function! s:o.each_color_call(f)"{{{
-    for c in self.colors
-        call call(a:f, [c], self)
-    endfor
-endfunction"}}}
-function! s:o.syn_clear()"{{{
-    call self.each_color_exe('"syn clear " . c.hlname')
-    call self.matchdel_all()
-endfunction"}}}
+function! s:o.init() "{{{
+  let self.idx = 0
+  let self.colors = s:read_colors(g:quickhl_colors)
+  call self.init_highlight()
+endfunction "}}}
 
-function! s:o.matchdel_all()"{{{
-    call clearmatches()
-    " for id in self.match_ids
-        " call matchdelete(id)
-    " endfor
-endfunction"}}}
+function! s:o.init_highlight() "{{{
+  for color in self.colors
+    let cmd = 'highlight ' . color.name . ' ' . color.val
+    call s:exe(cmd)
+  endfor
+endfunction "}}}
 
-function! s:o.highlight_all()"{{{
-    call self.each_color_call(self.highlight)
-endfunction"}}}
-function! s:o.highlight(c)"{{{
-    " exe "syntax match " a:c.hlname . " '" . escape(a:c.keyword, "'") . "' containedin=ALL"
-    let id = matchadd(a:c.hlname, escape(a:c.keyword, "'"))
-    call add(self.match_ids, id)
-endfunction"}}}
-function! s:o.show_colors()"{{{
-    call self.each_color_exe('"highlight " . c.hlname')
-endfunction"}}}
-function! s:o.add(word)"{{{
-    " guard duplicate entry
-    if self.has_keyword(a:word)
-        call self.debug("dup: " . a:word)
-        return -1
+function! s:our_match() "{{{
+  return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
+endfunction "}}}
+
+function! quickhl#check() "{{{
+  echo len(s:our_match())
+  " return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
+endfunction "}}}
+
+function! s:clear_match() "{{{
+  for id in map(s:our_match(), 'v:val.id')
+    call matchdelete(id)
+  endfor
+endfunction "}}}
+
+function! s:o.reset() "{{{
+  for color in self.colors
+    let color.pattern = ""
+  endfor
+  let winnum = winnr()
+  exe "windo call <SID>clear_match()"
+  exe winnum . "wincmd w"
+endfunction "}}}
+
+function! s:o.refresh() "{{{
+  let winnum = winnr()
+  exe "windo call <SID>refresh_match()"
+  exe winnum . "wincmd w"
+endfunction "}}}
+
+function! s:refresh_match() "{{{
+  call s:clear_match()
+  for color in s:o.colors
+    let pattern = s:escape(color.pattern)
+    if !empty(pattern)
+      call s:decho(pattern)
     endif
-    let  self.colors[self.idx].keyword = a:word
-    let  self.kwlist[a:word] = self.idx
-    call self.debug("new: " . a:word)
-    call self.inc_idx()
-    call self.refresh()
-endfunction"}}}
-function! s:o.del(word)"{{{
-    let idx = get(self.kwlist, a:word, -1)
-    if idx != -1
-        let self.colors[idx].keyword = s:def_str
-        call remove(self.kwlist, a:word)
-        call self.debug("del: " . a:word)
-        call s:o.refresh()
+    call matchadd(color.name, pattern)
+  endfor
+endfunction "}}}
+
+function! s:o.inc_idx() "{{{
+  let self.idx = (self.idx + 1) % len(self.colors)
+endfunction "}}}
+
+function! s:o.show_colors() "{{{
+  for color in self.colors
+    call s:exe("highlight " . color.name)
+  endfor
+endfunction "}}}
+
+function! s:has_match(word) "{{{
+  for m in s:our_match()
+    if m.pattern == s:escape(a:word)
+      return 1
     endif
-endfunction"}}}
-function! s:o.list()"{{{
-    for c in self.colors
-        if c.keyword == s:def_str
-            continue
-        endif
-        exe  "echohl ". c.hlname|echo c.keyword|echohl None
+  endfor
+  return 0
+endfunction "}}}
+
+function! s:o.add(word) "{{{
+  if s:has_match(a:word)
+    call s:decho("duplicate: " . a:word)
+    return
+  endif
+  call s:decho("new: " . a:word)
+  let self.colors[self.idx].pattern = a:word
+  call self.inc_idx()
+  call self.refresh()
+endfunction "}}}
+
+function! s:o.del(word) "{{{
+  if s:has_match(a:word)
+    call s:decho("del: " . a:word)
+    for color in self.colors
+      if color.pattern == s:escape(a:word)
+        let color.pattern = ""
+      endif
     endfor
-endfunction"}}}
-function! s:o.has_keyword(word)"{{{
-    let keywords = map(deepcopy(self.colors), 'v:val.keyword')
-    return index(keywords, a:word) != -1 
-endfunction"}}}
-function! s:o.toggle(word)"{{{
-    if !self.has_keyword(a:word)
-        call self.add(a:word)
-    else
-        call self.del(a:word)
+  endif
+  call self.refresh()
+endfunction "}}}
+
+function! s:o.list() "{{{
+  for color in self.colors
+    if color.pattern == ""
+      continue
     endif
-endfunction"}}}
+    exe "echohl " . color.name
+    let cmd = "echo " . string(color.pattern)
+    exe cmd
+    echohl None
+  endfor
+endfunction "}}}
+
+function! s:o.toggle(word) "{{{
+  if !s:has_match(a:word)
+    call self.add(a:word)
+  else
+    call self.del(a:word)
+  endif
+endfunction "}}}
 
 call s:o.init()
+"}}}
 
-let s:metachar = '\/~.'
-function! s:extract_pattern(mode)
-    if a:mode == 'v'
-        normal `<
-        let s = col('.') - 1
-        normal `>
-        let e = col('.') - 1
-        let line = getline('.')
-        let pat = line[s : e]
-    else
-        let pat = expand('<cword>')
+" PublicInterface: {{{
+function! quickhl#toggle(mode) "{{{
+  let pattern = 
+        \ a:mode == 'n' ? expand('<cword>') :
+        \ a:mode == 'v' ? s:get_selected_text() :
+        \ ""
+  if pattern == ''
+    return
+  endif
+  call s:decho("[toggle] " . pattern)
+  call s:o.toggle(pattern)
+endfunction "}}}
+
+function! quickhl#match_toggle(mode) "{{{
+  call quickhl#match(a:mode, 'toggle')
+endfunction "}}}
+
+function! quickhl#match(mode, action) "{{{
+  if a:action == 'clear'
+    silent! match none
+    unlet b:quickhlmatch_pattern
+    return
+  endif
+
+  let pattern = expand('<cword>')
+  if a:action == 'toggle'
+    if exists('b:quickhlmatch_pattern')
+          \ && b:quickhlmatch_pattern == pattern
+      silent! match none
+      unlet b:quickhlmatch_pattern
+      return
     endif
-    return escape(pat, s:metachar)
-endfunction
+  endif
 
-" PublicInterface:
-function! quickhl#toggle(mode)"{{{
-    call s:o.toggle(s:extract_pattern(a:mode))
-endfunction"}}}
-function! quickhl#match(mode, action)"{{{
-    if a:action == 'clear'
-        silent! match none
-        return
-    endif
+  let b:quickhlmatch_pattern = pattern
+  highlight QuickhlMatch gui=undercurl guisp=Cyan
+  exe "match QuickhlMatch /". b:quickhlmatch_pattern . "/"
+endfunction "}}}
 
-    let pattern = s:extract_pattern(a:mode)
+function! quickhl#list() "{{{
+  call s:o.list()
+endfunction "}}}
 
-    if exists('b:quickmatch_pat') &&
-                \ b:quickmatch_pat == pattern &&
-                \ a:action == 'toggle'
-        silent! match none
-        unlet b:quickmatch_pat
-        return
-    endif
-    let b:quickmatch_pat = pattern
+function! quickhl#dump() "{{{
+  call s:o.dump()
+endfunction "}}}
 
-    " highlight QuickhlMatch gui=underline guisp=Cyan
-    highlight QuickhlMatch gui=undercurl guisp=Cyan
-    exe "match QuickhlMatch /". b:quickmatch_pat . "/"
-endfunction"}}}
-function! quickhl#list()"{{{
-    call s:o.list()
-endfunction"}}}
-function! quickhl#reset()"{{{
-    call s:o.reset()
-endfunction"}}}
-function! quickhl#add(word)"{{{
-    call s:o.add(a:word)
-endfunction"}}}
-function! quickhl#del(word)"{{{
-    call s:o.del(a:word)
-endfunction"}}}
-function! quickhl#colors()"{{{
-    call s:o.show_colors()
-endfunction"}}}
-function! quickhl#refresh()"{{{
-    call s:o.refresh()
-endfunction"}}}
+function! quickhl#reset() "{{{
+  call s:o.reset()
+endfunction "}}}
 
-" vim: set sw=4 sts=4 et fdm=marker:
+function! quickhl#add(word) "{{{
+  call s:o.add(a:word)
+endfunction "}}}
+
+function! quickhl#del(word) "{{{
+  call s:o.del(a:word)
+endfunction "}}}
+
+function! quickhl#colors() "{{{
+  call s:o.show_colors()
+endfunction "}}}
+
+function! quickhl#refresh() "{{{
+  call s:o.refresh()
+endfunction "}}}
+
+function! quickhl#init_highlight() "{{{
+  call s:o.init_highlight()
+endfunction "}}}
+"}}}
+
+" vim: foldmethod=marker
