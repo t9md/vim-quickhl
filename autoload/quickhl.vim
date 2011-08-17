@@ -67,6 +67,10 @@ function! s:o.init_highlight() "{{{
   call self.inject_keywords()
 endfunction "}}}
 
+if !exists("g:quickhl_keywords")
+  let g:quickhl_keywords = {}
+endif
+
 function! s:o.inject_keywords()
   let keywords = get(g:quickhl_keywords, &filetype, {})
   if !empty(keywords)
