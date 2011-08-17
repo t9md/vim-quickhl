@@ -1,5 +1,5 @@
-" Utility: {{{
 
+" Utility: {{{
 "copy & paste from tyru's open-browser.vim
 function! s:get_selected_text() "{{{
   let save_z = getreg('z', 1)
@@ -11,16 +11,6 @@ function! s:get_selected_text() "{{{
     call setreg('z', save_z, save_z_type)
   endtry
 endfunction "}}}
-
-" function! s:get_selected_text() "{{{
-  " normal `<
-  " let s = col('.') - 1
-  " normal `>
-  " let e = col('.') - 1
-  " let line = getline('.')
-  " let pat = line[s : e]
-  " return pat
-" endfunction "}}}
 
 let s:metachar = '\/~ .*^[''$'
 function! s:escape(pattern) "{{{
@@ -50,6 +40,10 @@ endfunction "}}}
 " MAIN: {{{
 let s:o = {}
 function! s:o.dump() "{{{
+  if !exists("*PP")
+    echoerr "need prettyprint.vim"
+    return
+  endif
   echo PP(self)
 endfunction "}}}
 
@@ -67,18 +61,11 @@ function! s:o.init_highlight() "{{{
   call self.inject_keywords()
 endfunction "}}}
 
-if !exists("g:quickhl_keywords")
-  let g:quickhl_keywords = {}
-endif
-
-function! s:o.inject_keywords()
-  let keywords = get(g:quickhl_keywords, &filetype, {})
-  if !empty(keywords)
-    for keyword in keywords
-      call self.add(keyword)
-    endfor
-  endif
-endfunction
+function! s:o.inject_keywords() "{{{
+  for keyword in g:quickhl_keywords
+    call self.add(keyword)
+  endfor
+endfunction "}}}
 
 function! s:our_match() "{{{
   return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
@@ -99,14 +86,14 @@ function! s:o.reset() "{{{
   for color in self.colors
     let color.pattern = ""
   endfor
-  call self.inject_keywords()
-  let lazyredraw_orig = &lazyredraw
-  set lazyredraw
+  let self.idx = 0
+  " let lazyredraw_orig = &lazyredraw
+  " set lazyredraw
   let winnum = winnr()
   exe "windo call <SID>clear_match()"
   exe winnum . "wincmd w"
-  let &lazyredraw = lazyredraw_orig
-  redraw
+  " let &lazyredraw = lazyredraw_orig
+  call self.inject_keywords()
 endfunction "}}}
 
 function! s:o.refresh() "{{{
@@ -116,13 +103,16 @@ function! s:o.refresh() "{{{
 endfunction "}}}
 
 function! s:refresh_match() "{{{
+  if exists("b:quickhl_lock")
+    return
+  endif
   call s:clear_match()
   for color in s:o.colors
-    let pattern = s:escape(color.pattern)
-    if !empty(pattern)
-      call s:decho(pattern)
+    let escaped_pattern = s:escape(color.pattern)
+    if !empty(escaped_pattern)
+      call s:decho(escaped_pattern)
     endif
-    call matchadd(color.name, pattern)
+    call matchadd(color.name, escaped_pattern)
   endfor
 endfunction "}}}
 
@@ -204,11 +194,7 @@ function! quickhl#toggle(mode) "{{{
   call s:o.toggle(pattern)
 endfunction "}}}
 
-function! quickhl#match_toggle(mode) "{{{
-  call quickhl#match(a:mode, 'toggle')
-endfunction "}}}
-
-function! quickhl#match(mode, action) "{{{
+function! quickhl#match(action) "{{{
   if a:action == 'clear'
     silent! match none
     unlet b:quickhlmatch_pattern
@@ -232,6 +218,16 @@ endfunction "}}}
 
 function! quickhl#list() "{{{
   call s:o.list()
+endfunction "}}}
+
+function! quickhl#lock() "{{{
+  let b:quickhl_lock = 1
+  call s:clear_match()
+endfunction "}}}
+
+function! quickhl#unlock() "{{{
+  unlet! b:quickhl_lock
+  call s:refresh_match()
 endfunction "}}}
 
 function! quickhl#dump() "{{{

@@ -3,7 +3,7 @@
 " Author: t9md <taqumd@gmail.com>
 " WebPage: http://github.com/t9md/quickhl.vim
 " License: BSD
-" Version: 0.2
+" Version: 0.3
 "=============================================================================
 
 " GUARD: {{{
@@ -11,6 +11,7 @@
 if exists('g:quickhl_dev')
   unlet! g:loaded_quickhl
 endif
+
 if !exists('g:quickhl_debug')
   let g:quickhl_debug = 0
 endif
@@ -24,7 +25,7 @@ let s:old_cpo = &cpo
 set cpo&vim
 "}}}
 
-" ColorList: {{{
+" GlobalVar: {{{
 if !exists("g:quickhl_colors")
   let g:quickhl_colors = [
         \ "gui=bold ctermfg=16  ctermbg=153 guifg=#ffffff guibg=#0a7383",
@@ -42,6 +43,10 @@ if !exists("g:quickhl_colors")
         \ "gui=bold ctermfg=7   ctermbg=56  guibg=#a0b0c0 guifg=black",
         \ ]
 endif
+
+if !exists("g:quickhl_keywords")
+  let g:quickhl_keywords = []
+endif
 "}}}
 
 " Keymap: {{{
@@ -51,8 +56,7 @@ vnoremap <silent> <Plug>(quickhl-toggle) :call quickhl#toggle('v')<CR>
 nnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
 
-nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match_toggle('n')<CR>
-vnoremap <silent> <Plug>(quickhl-match) :call quickhl#match_toggle('v')<CR>
+nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match("toggle")<CR>
 "}}}
 
 " Command: {{{
@@ -63,9 +67,11 @@ command! QuickhlColors        :call quickhl#colors()
 command! QuickhlReloadColors  :call quickhl#init_highlight()
 command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
 command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
+command! QuickhlLock          :call quickhl#lock()
+command! QuickhlUnLock        :call quickhl#unlock()
 
-command! QuickhlMatch         :call quickhl#match('n',"on")
-command! QuickhlMatchClear    :call quickhl#match('n',"clear")
+command! QuickhlMatch         :call quickhl#match("on")
+command! QuickhlMatchClear    :call quickhl#match("clear")
 command! QuickhlMatchAuto     :call <SID>quickhl_match_auto()
 command! QuickhlMatchNoAuto   :call <SID>quickhl_match_manual()
 "}}}
@@ -85,6 +91,7 @@ endfunction
 
 augroup QuickhlHL
   autocmd!
+  autocmd VimEnter * call quickhl#refresh()
   autocmd WinEnter * call quickhl#refresh()
   autocmd TabEnter *
         \   if exists(':Tcolorscheme')
