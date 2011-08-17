@@ -79,7 +79,7 @@ command! QuickhlMatchNoAuto   :call <SID>quickhl_match_manual()
 " AutoCmd: {{{
 function! s:quickhl_match_auto()
   augroup QuickhlMatch
-      autocmd! CursorMoved <buffer> call quickhl#match('n',"on")
+      autocmd! CursorMoved <buffer> call quickhl#match("on")
   augroup end
 endfunction
 

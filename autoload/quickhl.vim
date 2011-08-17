@@ -1,4 +1,3 @@
-
 " Utility: {{{
 "copy & paste from tyru's open-browser.vim
 function! s:get_selected_text() "{{{
@@ -71,11 +70,6 @@ function! s:our_match() "{{{
   return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
 endfunction "}}}
 
-function! quickhl#check() "{{{
-  echo len(s:our_match())
-  " return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
-endfunction "}}}
-
 function! s:clear_match() "{{{
   for id in map(s:our_match(), 'v:val.id')
     call matchdelete(id)
@@ -87,12 +81,9 @@ function! s:o.reset() "{{{
     let color.pattern = ""
   endfor
   let self.idx = 0
-  " let lazyredraw_orig = &lazyredraw
-  " set lazyredraw
   let winnum = winnr()
   exe "windo call <SID>clear_match()"
   exe winnum . "wincmd w"
-  " let &lazyredraw = lazyredraw_orig
   call self.inject_keywords()
 endfunction "}}}
 
