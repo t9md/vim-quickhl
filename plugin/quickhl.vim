@@ -1,7 +1,7 @@
 "=============================================================================
 " File: quickhl.vim
 " Author: t9md <taqumd@gmail.com>
-" WebPage: http://github.com/t9md/quickhl.vim
+" WebPage: http://github.com/t9md/vim-quickhl
 " License: BSD
 " Version: 0.3
 "=============================================================================
