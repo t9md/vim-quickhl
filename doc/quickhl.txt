@@ -102,6 +102,12 @@ in your '.vimrc'.
           \ "gui=bold guibg=#a07040 guifg=#ffffff",
           \ "gui=bold guibg=#4070a0 guifg=#ffffff",
           \ ]
+
+<
+
+To highlight some keyword always,
+>
+    let g:quickhl_keywords = [ "TODO", "CAUTION", "ERROR" ]
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
