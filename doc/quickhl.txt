@@ -10,7 +10,7 @@
       `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o <
 
 
-Version: 0.3
+Version: 0.4
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
@@ -105,7 +105,8 @@ in your '.vimrc'.
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
-
+2011-08-21: v0.4
+	- fix compatibility issue for pre v7.2
 2011-08-18: v0.3
 	- add new command :QuickhlLock and :QuichlUnlock.
 2011-08-17: v0.2
