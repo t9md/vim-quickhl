@@ -17,11 +17,17 @@ function! s:escape(pattern) "{{{
 endfunction "}}}
 
 function! s:read_colors(list) "{{{
-  return map(copy(a:list),'{ 
-        \ "name": "Quickhl" . v:key,
-        \ "val": v:val,
-        \ "pattern": "",
-        \ }')
+  let colors = []
+  let index = 0
+  while index < len(a:list)
+    call add(colors, {
+          \ "name": "Quickhl" . index,
+          \ "val": a:list[index],
+          \ "pattern": "",
+          \ })
+    let index += 1
+  endwhile
+  return colors
 endfunction "}}}
 
 function! s:decho(msg) "{{{
