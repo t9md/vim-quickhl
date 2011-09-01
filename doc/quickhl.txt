@@ -1,4 +1,4 @@
-*quickhl.txt* Quickly highlight multiple word.
+*quickhl.txt* Quickly highlight multiple pattern.
 						      
 						      
        .oooooo.                o8o          oooo       oooo       oooo  ~
@@ -57,8 +57,13 @@ COMMANDS						*quickhl-commands*
 :QuickhlDump		Used for debug. depend on thinca's prettyprint.vim.
 :QuickhlColors		Show colors
 :QuickhlReloadColors	reload color table from |g:quickhl_colors|.
-:QuickhlAdd {word}	Add {word}
-:QuickhlDel {word}	Delete {word}
+:QuickhlAdd {pattern}	Add {pattern}
+:QuickhlAdd! {pattern}	Add |regexp| {pattern}.
+			{pattern} is passed to |matchadd()| without escape.
+:QuickhlDel {pattern}	Delete {pattern}.
+			if {pattern} was omitted, ask delete index interactively.
+:QuickhlDel! {pattern}	Delete regexp {pattern}.
+			{pattern} will compared without escape metachar.
 :QuickhlLock		Lock highlight on current buffer.
 :QuickhlUnLock		UnLock highlight on current buffer.
 
@@ -107,10 +112,20 @@ in your '.vimrc'.
 
 To highlight some keyword always,
 >
-    let g:quickhl_keywords = [ "TODO", "CAUTION", "ERROR" ]
+    let g:quickhl_keywords = [
+          \ {"pattern": "t9md" },
+          \ {"pattern": "Shougo" },
+          \ {"pattern": '\d\+', "regexp": 1 },
+          \ {"pattern": "thinca" },
+          \ {"pattern": "ujihisa" },
+          \ ]
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
+2011-09-01:
+	- support regexp pattern
+	- extend command :QuickhlDel could delete by index
+	- extend g:quickhl_keywords to support regexp pattern.
 2011-08-21: v0.4
 	- fix compatibility issue for pre v7.2
 2011-08-18: v0.3

@@ -60,20 +60,20 @@ nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match("toggle")<CR>
 "}}}
 
 " Command: {{{
-command! QuickhlList          :call quickhl#list()
-command! QuickhlDump          :call quickhl#dump()
-command! QuickhlReset         :call quickhl#reset()
-command! QuickhlColors        :call quickhl#colors()
-command! QuickhlReloadColors  :call quickhl#init_highlight()
-command! -nargs=1 QuickhlAdd  :call quickhl#add(<q-args>)
-command! -nargs=1 QuickhlDel  :call quickhl#del(<q-args>)
-command! QuickhlLock          :call quickhl#lock()
-command! QuickhlUnLock        :call quickhl#unlock()
+command!                QuickhlList           :call quickhl#list()
+command!                QuickhlDump           :call quickhl#dump()
+command!                QuickhlReset          :call quickhl#reset()
+command!                QuickhlColors         :call quickhl#colors()
+command!                QuickhlReloadColors   :call quickhl#init_highlight()
+command! -bang -nargs=1 QuickhlAdd            :call quickhl#add(<q-args>,<bang>0)
+command! -bang -nargs=* QuickhlDel            :call quickhl#del(<q-args>,<bang>0)
+command!                QuickhlLock           :call quickhl#lock()
+command!                QuickhlUnLock         :call quickhl#unlock()
 
-command! QuickhlMatch         :call quickhl#match("on")
-command! QuickhlMatchClear    :call quickhl#match("clear")
-command! QuickhlMatchAuto     :call <SID>quickhl_match_auto()
-command! QuickhlMatchNoAuto   :call <SID>quickhl_match_manual()
+command! QuickhlMatch       :call quickhl#match("on")
+command! QuickhlMatchClear  :call quickhl#match("clear")
+command! QuickhlMatchAuto   :call <SID>quickhl_match_auto()
+command! QuickhlMatchNoAuto :call <SID>quickhl_match_manual()
 "}}}
 
 " AutoCmd: {{{

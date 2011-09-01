@@ -11,9 +11,15 @@ function! s:get_selected_text() "{{{
   endtry
 endfunction "}}}
 
+function! s:report_error(error)
+	echohl WarningMsg
+  echomsg 'quickhl:  ' . a:error
+  echohl None
+endfunction
+
 let s:metachar = '\/~ .*^[''$'
 function! s:escape(pattern) "{{{
-  return escape(a:pattern,s:metachar)
+  return escape(a:pattern, s:metachar)
 endfunction "}}}
 
 function! s:read_colors(list) "{{{
@@ -24,6 +30,7 @@ function! s:read_colors(list) "{{{
           \ "name": "Quickhl" . index,
           \ "val": a:list[index],
           \ "pattern": "",
+          \ "regexp": 0,
           \ })
     let index += 1
   endwhile
@@ -68,7 +75,7 @@ endfunction "}}}
 
 function! s:o.inject_keywords() "{{{
   for keyword in g:quickhl_keywords
-    call self.add(keyword)
+    call self.add(keyword.pattern, get(keyword, "regexp", 0))
   endfor
 endfunction "}}}
 
@@ -105,11 +112,17 @@ function! s:refresh_match() "{{{
   endif
   call s:clear_match()
   for color in s:o.colors
-    let escaped_pattern = s:escape(color.pattern)
-    if !empty(escaped_pattern)
-      call s:decho(escaped_pattern)
+    let pattern = color.regexp ? color.pattern : s:escape(color.pattern)
+    if !empty(pattern)
+      call s:decho(pattern)
     endif
-    call matchadd(color.name, escaped_pattern)
+    try
+      call matchadd(color.name, pattern)
+    catch
+      call s:report_error(v:exception)
+      call s:report_error("delete pattern " . string(pattern))
+      let color.pattern = ""
+    endtry
   endfor
 endfunction "}}}
 
@@ -123,55 +136,72 @@ function! s:o.show_colors() "{{{
   endfor
 endfunction "}}}
 
-function! s:has_match(word) "{{{
+function! s:has_match(pattern) "{{{
   for m in s:our_match()
-    if m.pattern == s:escape(a:word)
+    if m.pattern == a:pattern
       return 1
     endif
   endfor
   return 0
 endfunction "}}}
 
-function! s:o.add(word) "{{{
-  if s:has_match(a:word)
-    call s:decho("duplicate: " . a:word)
+function! s:o.add(pattern, regexp) "{{{
+  let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
+  if s:has_match(pattern)
+    call s:decho("duplicate: " . pattern)
     return
   endif
-  call s:decho("new: " . a:word)
-  let self.colors[self.idx].pattern = a:word
+  call s:decho("new: " . pattern)
+  let self.colors[self.idx].pattern = pattern
+  let self.colors[self.idx].regexp  = a:regexp
   call self.inc_idx()
   call self.refresh()
 endfunction "}}}
 
-function! s:o.del(word) "{{{
-  if s:has_match(a:word)
-    call s:decho("del: " . a:word)
+function! s:o.del(pattern, regexp) "{{{
+  let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
+  if s:has_match(pattern)
+    call s:decho("del: " . pattern)
     for color in self.colors
-      if color.pattern == a:word
+      if color.pattern == pattern
         let color.pattern = ""
       endif
     endfor
+  else
+    call s:report_error("pattern not found: " . string(pattern))
+  endif
+  call self.refresh()
+endfunction "}}}
+
+function! s:o.del_by_index(idx) "{{{
+  let color = get(self.colors, a:idx, {})
+  if !empty(color) && !empty(color.pattern)
+    let self.colors[a:idx].pattern = ""
+  else
+    call s:report_error("index not found: " . a:idx)
   endif
   call self.refresh()
 endfunction "}}}
 
 function! s:o.list() "{{{
-  for color in self.colors
+  for idx in range(len(self.colors))
+    let color = self.colors[idx]
     if color.pattern == ""
       continue
     endif
+    echo printf("%2d: ", idx)
     exe "echohl " . color.name
-    let cmd = "echo " . string(color.pattern)
+    let cmd = "echon " . string(color.pattern)
     exe cmd
     echohl None
   endfor
 endfunction "}}}
 
-function! s:o.toggle(word) "{{{
-  if !s:has_match(a:word)
-    call self.add(a:word)
+function! s:o.toggle(pattern) "{{{
+  if !s:has_match(s:escape(a:pattern))
+    call self.add(a:pattern, 0)
   else
-    call self.del(a:word)
+    call self.del(a:pattern, 0)
   endif
 endfunction "}}}
 
@@ -235,12 +265,21 @@ function! quickhl#reset() "{{{
   call s:o.reset()
 endfunction "}}}
 
-function! quickhl#add(word) "{{{
-  call s:o.add(a:word)
+function! quickhl#add(pattern, regexp) "{{{
+  call s:o.add(a:pattern, a:regexp)
 endfunction "}}}
 
-function! quickhl#del(word) "{{{
-  call s:o.del(a:word)
+function! quickhl#del(pattern, regexp) "{{{
+  if empty(a:pattern)
+    call s:o.list()
+    let index = input("index to delete: ")
+    if empty(index)
+      return
+    endif
+    call s:o.del_by_index(index)
+  else
+    call s:o.del(a:pattern, a:regexp)
+  endif
 endfunction "}}}
 
 function! quickhl#colors() "{{{
