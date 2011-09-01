@@ -142,8 +142,6 @@ endfunction "}}}
 
 function! s:has_match(pattern) "{{{
   for m in s:our_match()
-    " echo "ABC: " . m.pattern
-    " echo "ABC: " . a:pattern
     if m.pattern == a:pattern
       return 1
     endif
