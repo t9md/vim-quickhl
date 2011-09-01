@@ -75,7 +75,12 @@ endfunction "}}}
 
 function! s:o.inject_keywords() "{{{
   for keyword in g:quickhl_keywords
-    call self.add(keyword.pattern, get(keyword, "regexp", 0))
+    if type(keyword) == type("")
+      call self.add(keyword, 0)
+    elseif type(keyword) == type({})
+      call self.add(keyword.pattern, get(keyword, "regexp", 0))
+    endif
+    unlet keyword
   endfor
 endfunction "}}}
 
@@ -112,15 +117,14 @@ function! s:refresh_match() "{{{
   endif
   call s:clear_match()
   for color in s:o.colors
-    let pattern = color.regexp ? color.pattern : s:escape(color.pattern)
-    if !empty(pattern)
-      call s:decho(pattern)
+    if !empty(color.pattern)
+      call s:decho(color.pattern)
     endif
     try
-      call matchadd(color.name, pattern)
+      call matchadd(color.name, color.pattern)
     catch
       call s:report_error(v:exception)
-      call s:report_error("delete pattern " . string(pattern))
+      call s:report_error("delete pattern " . string(color.pattern))
       let color.pattern = ""
     endtry
   endfor
@@ -138,6 +142,8 @@ endfunction "}}}
 
 function! s:has_match(pattern) "{{{
   for m in s:our_match()
+    " echo "ABC: " . m.pattern
+    " echo "ABC: " . a:pattern
     if m.pattern == a:pattern
       return 1
     endif

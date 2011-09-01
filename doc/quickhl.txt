@@ -10,7 +10,7 @@
       `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o <
 
 
-Version: 0.4
+Version: 0.5
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
@@ -85,6 +85,8 @@ g:quickhl_colors
 							  *g:quickhl_keywords*
 g:quickhl_keywords
 	|List| of keyword always highlighted.
+        'keyword' could be specified as sequence of |String| or |Dictionary|.
+        See |quickhl-examples|
 
 ==============================================================================
 CONFIGURATION EXAMPLE                               *quickhl-examples*
@@ -110,19 +112,36 @@ in your '.vimrc'.
 
 <
 
-To highlight some keyword always,
+|g:quickhl_keywords| could be specified either sequence of 'string' or 'dictionary'
+See following example.
+
+To highlight some static keyword always(sequence of string),
 >
     let g:quickhl_keywords = [
-          \ {"pattern": "t9md" },
-          \ {"pattern": "Shougo" },
-          \ {"pattern": '\d\+', "regexp": 1 },
-          \ {"pattern": "thinca" },
-          \ {"pattern": "ujihisa" },
+          \ "WORD1",
+          \ "WORD2",
+          \ ]
+<
+
+To highlight some keyword always(sequence of dictionary),
+>
+    let g:quickhl_keywords = [
+          \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
+          \ {"pattern": 'NOTE'},
+          \ {"pattern": 'MEMO'},
+          \ ]
+<
+To highlight some keyword always(combined),
+>
+    let g:quickhl_keywords = [
+          \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
+          \ "NOTE",
+          \ "MEMO",
           \ ]
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
-2011-09-01:
+2011-09-01: v0.5
 	- support regexp pattern
 	- extend command :QuickhlDel could delete by index
 	- extend g:quickhl_keywords to support regexp pattern.
