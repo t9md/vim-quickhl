@@ -63,6 +63,7 @@ function! s:o.init() "{{{
   let self.idx = 0
   let self.colors = s:read_colors(g:quickhl_colors)
   call self.init_highlight()
+  call self.inject_keywords()
 endfunction "}}}
 
 function! s:o.init_highlight() "{{{
@@ -70,7 +71,7 @@ function! s:o.init_highlight() "{{{
     let cmd = 'highlight ' . color.name . ' ' . color.val
     call s:exe(cmd)
   endfor
-  call self.inject_keywords()
+  " call self.inject_keywords()
 endfunction "}}}
 
 function! s:o.inject_keywords() "{{{

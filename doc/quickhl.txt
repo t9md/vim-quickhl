@@ -141,6 +141,8 @@ To highlight some keyword always(combined),
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
+2011-09-03:
+	- bugfix duplicate keyword added when TabEnter or ColorScheme event.
 2011-09-01: v0.5
 	- support regexp pattern
 	- extend command :QuickhlDel could delete by index
