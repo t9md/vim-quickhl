@@ -234,6 +234,11 @@ function! quickhl#match(action) "{{{
   endif
 
   let pattern = expand('<cword>')
+  if pattern == '' " this might happen on an empty line
+    silent! match none
+    return
+  endif
+
   if a:action == 'toggle'
     if exists('b:quickhlmatch_pattern')
           \ && b:quickhlmatch_pattern == pattern
