@@ -249,7 +249,7 @@ function! quickhl#match(action) "{{{
   endif
 
   let b:quickhlmatch_pattern = pattern
-  highlight QuickhlMatch gui=undercurl guisp=Cyan
+  exe 'highlight QuickhlMatch ' . g:quickhl_match_highlight
   exe 'match QuickhlMatch /\V' . escape(b:quickhlmatch_pattern, '/') . '/'
 endfunction "}}}
 
