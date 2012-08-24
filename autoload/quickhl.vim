@@ -250,7 +250,7 @@ function! quickhl#match(action) "{{{
 
   let b:quickhlmatch_pattern = pattern
   highlight QuickhlMatch gui=undercurl guisp=Cyan
-  exe "match QuickhlMatch /". b:quickhlmatch_pattern . "/"
+  exe 'match QuickhlMatch /\V' . escape(b:quickhlmatch_pattern, '/') . '/'
 endfunction "}}}
 
 function! quickhl#list() "{{{
