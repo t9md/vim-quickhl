@@ -100,17 +100,21 @@ function! s:o.reset() "{{{
     let color.pattern = ""
   endfor
   let self.idx = 0
-  let winnum = winnr()
-  exe "windo call <SID>clear_match()"
-  exe winnum . "wincmd w"
+  call s:windo(function('s:clear_match'))
   call self.inject_keywords()
 endfunction "}}}
 
 function! s:o.refresh() "{{{
-  let winnum = winnr()
-  exe "windo call <SID>refresh_match()"
-  exe winnum . "wincmd w"
+  call s:windo(function('s:refresh_match'))
 endfunction "}}}
+
+function! s:windo(func)
+  let winnum = winnr()
+  let pwinnum = winnr('#')
+  noautocmd windo call a:func()
+  execute pwinnum . "wincmd w"
+  execute winnum . "wincmd w"
+endfunction
 
 function! s:refresh_match() "{{{
   if exists("b:quickhl_lock")
