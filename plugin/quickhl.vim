@@ -44,6 +44,10 @@ if !exists("g:quickhl_colors")
         \ ]
 endif
 
+if !exists("g:quickhl_match_highlight")
+  let g:quickhl_match_highlight = 'term=standout cterm=standout gui=standout'
+endif
+
 if !exists("g:quickhl_keywords")
   let g:quickhl_keywords = []
 endif

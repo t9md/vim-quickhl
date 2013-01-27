@@ -238,6 +238,11 @@ function! quickhl#match(action) "{{{
   endif
 
   let pattern = expand('<cword>')
+  if pattern == '' " this might happen on an empty line
+    silent! match none
+    return
+  endif
+
   if a:action == 'toggle'
     if exists('b:quickhlmatch_pattern')
           \ && b:quickhlmatch_pattern == pattern
@@ -248,8 +253,8 @@ function! quickhl#match(action) "{{{
   endif
 
   let b:quickhlmatch_pattern = pattern
-  highlight QuickhlMatch gui=undercurl guisp=Cyan
-  exe "match QuickhlMatch /". b:quickhlmatch_pattern . "/"
+  exe 'highlight QuickhlMatch ' . g:quickhl_match_highlight
+  exe 'match QuickhlMatch /\V' . escape(b:quickhlmatch_pattern, '/') . '/'
 endfunction "}}}
 
 function! quickhl#list() "{{{
