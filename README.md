@@ -11,8 +11,6 @@ quickhl.vim is minimal utility for
 * quickly highlight `<cword>`
 * quickly highlight visually selected text.
 
+![Example](https://github.com/t9md/t9md/blob/master/img/quickhl_anime.gif)
 ### [ScreenCast](http://www.youtube.com/watch?v=W_XJlTbuoyI)
 ### [help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
-
-![quickhl.png](https://github.com/t9md/t9md/raw/master/img/quickhl.png)
-
