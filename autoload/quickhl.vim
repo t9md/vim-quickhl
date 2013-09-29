@@ -21,13 +21,8 @@ function! s:escape(pattern) "{{{
   return escape(a:pattern, s:metachar)
 endfunction "}}}
 
-function! s:read_colors(list) "{{{
-  return map(copy(a:list), '{
-        \ "name": "Quickhl" . v:key,
-        \ "val": v:val,
-        \ "pattern": "",
-        \ "regexp": 0,
-        \ }')
+function! s:our_match(pattern) "{{{
+  return filter(getmatches(), "v:val.group =~# '". a:pattern . "'")
 endfunction "}}}
 
 function! s:decho(msg) "{{{
@@ -40,70 +35,88 @@ function! s:exe(cmd) "{{{
   call s:decho("[cmd] " . a:cmd)
   exe a:cmd
 endfunction "}}}
+
+function! s:windo(func) "{{{
+  let winnum = winnr()
+  let pwinnum = winnr('#')
+  " echo [pwinnum, winnum]
+  noautocmd windo call a:func()
+  execute pwinnum . "wincmd w"
+  execute winnum . "wincmd w"
+endfunction "}}}
 " }}}
 
-" MAIN: {{{
 let s:metachar = '\/~ .*^[''$'
 
-let s:user = { }
-let s:hl_name_tag = "QuickhlTag"
-let s:hl_name_hl = 'Quickhl\d'
-" default 10, 
-let s:quickhltag_hl_priority = 9
-let g:quichltag_enable = 0
-
+" QuickhlTag: {{{
 let s:tag = {
-      \ "hl_name": "QuickhlTag",
-      \ "hl_priority": s:quickhltag_hl_priority,
+      \ "name": "QuickhlTag",
+      \ "enable": g:quickhltag_enable_at_startup,
+      \ "priority": g:quickhltag_hl_priority,
       \ }
-function! s:tag.set_hl() "{{{
-  call map(taglist('.*'), 'matchadd("'. self.hl_name . '", v:val.name, self.hl_priority)')
+
+function! s:tag.set() "{{{
+  call map(taglist('.*'), 'matchadd("'. self.name . '", v:val.name, self.priority)')
 endfunction "}}}
 
-function! s:tag.clear_hl() "{{{
-  call map(map(s:our_match(self.hl_name), 'v:val.id'), 'matchdelete(v:val)')
+function! s:tag.clear() "{{{
+  call map(map(s:our_match(self.name), 'v:val.id'), 'matchdelete(v:val)')
 endfunction "}}}
 
 function! s:tag.refresh() "{{{
   " only enable on normal(&buftype is empty) buffer.
   if !empty(&buftype) | return | endif
-  call self.clear_hl()
-  if !g:quichltag_enable | return | endif
-  call self.set_hl()
+  call self.clear()
+  if !self.enable | return | endif
+  call self.set()
 endfunction "}}}
 
-function! s:refresh()
+function! s:tag_refresh() "{{{
   call s:tag.refresh()
-endfunction
+endfunction "}}}
 
 function! quickhl#tag_enable() "{{{
-  let g:quichltag_enable = 1
+  let s:tag.enable = 1
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_disable() "{{{
-  let g:quichltag_enable = 0
+  let s:tag.enable = 0
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_toggle() "{{{
-  let g:quichltag_enable = !g:quichltag_enable
+  let s:tag.enable = !s:tag.enable
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_do() "{{{
   augroup QuickhlTag
     autocmd!
-    if g:quichltag_enable
-      autocmd VimEnter,WinEnter * call quickhl#tag_refresh()
+    if s:tag.enable
+      " autocmd VimEnter,WinEnter * call quickhl#tag_refresh()
+      autocmd BufEnter,WinEnter * call quickhl#tag_refresh()
     endif
   augroup END
-
   call quickhl#tag_refresh()
 endfunction "}}}
 
 function! quickhl#tag_refresh() "{{{
-  call s:windo(function('s:refresh'))
+  " echo "called 1"
+  " echo "called 2"
+  call s:windo(function('s:tag_refresh'))
+endfunction "}}}
+ "}}}
+
+" QuickhlUser: {{{
+let s:user = {
+      \ "name": 'Quickhl\d',
+      \ "idx": 0,
+      \ "enable": g:quickhluser_enable_at_startup,
+      \ }
+
+function! s:user_clear() "{{{
+  call s:user.clear()
 endfunction "}}}
 
 function! s:user.dump() "{{{
@@ -115,17 +128,24 @@ function! s:user.dump() "{{{
 endfunction "}}}
 
 function! s:user.init() "{{{
-  let  self.idx = 0
-  let  self.colors = s:read_colors(g:quickhl_colors)
+  let  self.colors = self.read_colors(g:quickhl_colors)
   call self.init_highlight()
   call self.inject_keywords()
   call self.refresh()
 endfunction "}}}
 
+function! s:user.read_colors(list) "{{{
+  return map(copy(a:list), '{
+        \ "name": "Quickhl" . v:key,
+        \ "val": v:val,
+        \ "pattern": "",
+        \ "regexp": 0,
+        \ }')
+endfunction "}}}
+
 function! s:user.init_highlight() "{{{
   " [TODO] should update(extend()) with new color but don't change other
   " fields.
-  " let self.colors = s:read_colors(g:quickhl_colors)
   for color in self.colors
     let cmd = 'highlight ' . color.name . ' ' . color.val
     call s:exe(cmd)
@@ -143,14 +163,14 @@ function! s:user.inject_keywords() "{{{
   endfor
 endfunction "}}}
 
-function! s:our_match(pattern) "{{{
-  return filter(getmatches(), "v:val.group =~# '". a:pattern . "'")
+function! s:user.set() "{{{
+  for color in self.colors
+    call matchadd(color.name, color.pattern)
+  endfor
 endfunction "}}}
 
-function! s:clear_match() "{{{
-  for id in map(s:our_match(s:hl_name_hl), 'v:val.id')
-    call matchdelete(id)
-  endfor
+function! s:user.clear() "{{{
+  call map(map(s:our_match(self.name), 'v:val.id'), 'matchdelete(v:val)')
 endfunction "}}}
 
 function! s:user.reset() "{{{
@@ -158,66 +178,18 @@ function! s:user.reset() "{{{
     let color.pattern = ""
   endfor
   let self.idx = 0
-  call s:windo(function('s:clear_match'))
+  " call s:windo(function('s:user_clear'))
   call self.inject_keywords()
 endfunction "}}}
 
+function! s:user_refresh() "{{{
+  call s:user.refresh()
+endfunction "}}}
+
 function! s:user.refresh() "{{{
-  call s:windo(function('s:refresh_match'))
-endfunction "}}}
-
-function! s:set_winvar() "{{{
-  for n in map(range(winnr('$')), 'v:val+1')
-    call setwinvar(n, "quickhl_winno", n)
-  endfor
-endfunction "}}}
-
-function! s:get_winvar() "{{{
-  for n in map(range(winnr('$')), 'v:val+1')
-    let here = n == winnr() ? " <==" : ''
-    echo n . ":". getwinvar(n, "quickhl_winno", -1) . here
-  endfor
-endfunction "}}}
-
-function! s:find_win(num) "{{{
-  for n in map(range(winnr('$')), 'v:val+1')
-    if getwinvar(n, "quickhl_winno", -1)  == a:num
-      return n
-    endif
-  endfor
-  return -1
-endfunction "}}}
-
-function! s:windo(func) "{{{
-  let winnum = winnr()
-  let pwinnum = winnr('#')
-  " echo [pwinnum, winnum]
-  noautocmd windo call a:func()
-  execute pwinnum . "wincmd w"
-  execute winnum . "wincmd w"
-endfunction "}}}
-
-function! s:refresh_match() "{{{
-  if exists("b:quickhl_lock")
-    return
-  endif
-  call s:clear_match()
-  for color in s:user.colors
-    if !empty(color.pattern)
-      call s:decho(color.pattern)
-    endif
-    try
-      call matchadd(color.name, color.pattern)
-    catch
-      call s:report_error(v:exception)
-      call s:report_error("delete pattern " . string(color.pattern))
-      let color.pattern = ""
-    endtry
-  endfor
-endfunction "}}}
-
-function! s:user.inc_idx() "{{{
-  let self.idx = (self.idx + 1) % len(self.colors)
+  call self.clear()
+  " if ! self.enable | return | endif
+  call self.set()
 endfunction "}}}
 
 function! s:user.show_colors() "{{{
@@ -226,8 +198,8 @@ function! s:user.show_colors() "{{{
   endfor
 endfunction "}}}
 
-function! s:has_match(pattern) "{{{
-  for m in s:our_match(s:hl_name_hl)
+function! s:user.has_match(pattern) "{{{
+  for m in s:our_match(self.name)
     if m.pattern == a:pattern
       return 1
     endif
@@ -237,19 +209,19 @@ endfunction "}}}
 
 function! s:user.add(pattern, regexp) "{{{
   let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
-  if s:has_match(pattern)
+  if self.has_match(pattern)
     call s:decho("duplicate: " . pattern)
     return
   endif
   call s:decho("new: " . pattern)
   let self.colors[self.idx].pattern = pattern
   let self.colors[self.idx].regexp  = a:regexp
-  call self.inc_idx()
+  let self.idx = (self.idx + 1) % len(self.colors)
 endfunction "}}}
 
 function! s:user.del(pattern, regexp) "{{{
   let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
-  if s:has_match(pattern)
+  if self.has_match(pattern)
     call s:decho("del: " . pattern)
     for color in self.colors
       if color.pattern == pattern
@@ -284,102 +256,52 @@ function! s:user.list() "{{{
   endfor
 endfunction "}}}
 
-function! s:user.toggle(pattern) "{{{
-  if !s:has_match(s:escape(a:pattern))
-    call self.add(a:pattern, 0)
-  else
-    call self.del(a:pattern, 0)
-  endif
-  call s:user.refresh()
-endfunction "}}}
-
 call s:user.init()
-"}}}
 
-" PublicInterface: {{{
-function! quickhl#toggle(mode) "{{{
+function! quickhl#user_toggle(mode) "{{{
   let pattern = 
         \ a:mode == 'n' ? expand('<cword>') :
         \ a:mode == 'v' ? s:get_selected_text() :
         \ ""
-  if pattern == ''
-    return
-  endif
+  if pattern == '' | return | endif
   call s:decho("[toggle] " . pattern)
-  call s:user.toggle(pattern)
+  if !s:user.has_match(s:escape(pattern))
+    call s:user.add(pattern, 0)
+  else
+    call s:user.del(pattern, 0)
+  endif
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#match(action) "{{{
-  if a:action == 'clear'
-    silent! match none
-    unlet b:quickhlmatch_pattern
-    return
-  endif
-
-  let pattern = s:escape(expand('<cword>'))
-  if a:action == 'toggle'
-    if exists('b:quickhlmatch_pattern')
-          \ && b:quickhlmatch_pattern == pattern
-      silent! match none
-      unlet b:quickhlmatch_pattern
-      return
-    endif
-  endif
-
-  let b:quickhlmatch_pattern = pattern
-  " exe "highlight QuickhlMatch " . g:quickhl_match_color
-
-  exe "highlight link QuickhlMatch Search"
-  exe "match QuickhlMatch /". b:quickhlmatch_pattern . "/"
+function! quickhl#user_reset() "{{{
+  call s:user.reset()
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#match_auto(action) "{{{
-  if a:action == 'clear' || a:action == "toggle" && exists("b:quickhlmatch_pattern")
-    call quickhl#match("clear")
-    if exists("#QuickhlMatch")
-      augroup QuickhlMatch
-        autocmd!
-      augroup END
-      augroup! QuickhlMatch
-    endif
-    return
-  endif
-
-  call quickhl#match("on")
-  augroup QuickhlMatch
-    autocmd!
-    autocmd! CursorMoved <buffer> call quickhl#match("on")
-  augroup END
-endfunction "}}}
-
-function! quickhl#list() "{{{
+function! quickhl#user_list() "{{{
   call s:user.list()
 endfunction "}}}
 
-function! quickhl#lock() "{{{
-  let b:quickhl_lock = 1
-  call s:clear_match()
+function! quickhl#user_enable() "{{{
+  let s:user.enable = 1
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#unlock() "{{{
-  unlet! b:quickhl_lock
-  call s:refresh_match()
+function! quickhl#user_disable() "{{{
+  let s:user.enable = 0
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#dump() "{{{
+function! quickhl#user_dump() "{{{
   call s:user.dump()
 endfunction "}}}
 
-function! quickhl#reset() "{{{
-  call s:user.reset()
-endfunction "}}}
-
-function! quickhl#add(pattern, regexp) "{{{
+function! quickhl#user_add(pattern, regexp) "{{{
   call s:user.add(a:pattern, a:regexp)
-  call s:user.refresh()
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#del(pattern, regexp) "{{{
+function! quickhl#user_del(pattern, regexp) "{{{
   if empty(a:pattern)
     call s:user.list()
     let index = input("index to delete: ")
@@ -390,20 +312,82 @@ function! quickhl#del(pattern, regexp) "{{{
   else
     call s:user.del(a:pattern, a:regexp)
   endif
-  call s:user.refresh()
+  call quickhl#user_refresh()
 endfunction "}}}
 
-function! quickhl#colors() "{{{
+function! quickhl#user_colors() "{{{
   call s:user.show_colors()
 endfunction "}}}
 
-function! quickhl#refresh() "{{{
-  call s:user.refresh()
+function! quickhl#user_refresh() "{{{
+  call s:windo(function('s:user_refresh'))
 endfunction "}}}
 
-function! quickhl#init_highlight() "{{{
+function! quickhl#user_init_highlight() "{{{
   call s:user.init_highlight()
 endfunction "}}}
-"}}}
+ "}}}
+
+" QuickhlCword: {{{
+let s:cword = {
+      \ "enable": g:quickhlcword_enable_at_startup,
+      \ }
+
+function! s:cword.refresh() "{{{
+  silent! 2match none
+  if !self.enable | return | endif
+  let pattern = s:escape(expand('<cword>'))
+  exe "2match QuickhlCword /". pattern . "/"
+endfunction "}}}
+
+function! quickhl#cword_toggle() "{{{
+  " echo s:cword.enable
+  let s:cword.enable = !s:cword.enable
+  call quickhl#cword_do()
+endfunction "}}}
+
+function! quickhl#cword_enable() "{{{
+  let s:cword.enable = 1
+  call quickhl#cword_do()
+endfunction "}}}
+
+function! quickhl#cword_disable() "{{{
+  let s:cword.enable = 0
+  call quickhl#cword_do()
+endfunction "}}}
+
+function! quickhl#cword_refresh() "{{{
+  call s:cword.refresh()
+endfunction "}}}
+
+function! quickhl#cword_do() "{{{
+  augroup QuickhlCword
+    autocmd!
+    if s:cword.enable
+      autocmd! CursorMoved <buffer> call quickhl#cword_refresh()
+    endif
+  augroup END
+  call quickhl#cword_refresh()
+endfunction "}}}
+
+" function! quickhl#cword(action) "{{{
+  " if a:action == 'clear' || ( a:action == "toggle" && exists("b:quickhlmatch_pattern") )
+    " call quickhl#_cword("clear")
+    " if exists("#QuickhlCword")
+      " augroup QuickhlCword
+        " autocmd!
+      " augroup END
+      " augroup! QuickhlCword
+    " endif
+    " return
+  " endif
+
+  " call quickhl#match("on")
+  " augroup QuickhlMatch
+    " autocmd!
+    " autocmd! CursorMoved <buffer> call quickhl#match("on")
+  " augroup END
+" endfunction "}}}
+" }}}
 
 " vim: foldmethod=marker
