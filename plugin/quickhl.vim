@@ -33,8 +33,8 @@ endif
 "}}}
 
 " GlobalVar: {{{
-if !exists("g:quickhl_colors")
-  let g:quickhl_colors = [
+if !exists("g:quickhl_manual_colors")
+  let g:quickhl_manual_colors = [
         \ "gui=bold ctermfg=16  ctermbg=153 guifg=#ffffff guibg=#0a7383",
         \ "gui=bold ctermfg=7   ctermbg=1   guibg=#a07040 guifg=#ffffff",
         \ "gui=bold ctermfg=7   ctermbg=2   guibg=#4070a0 guifg=#ffffff",
@@ -53,11 +53,11 @@ if !exists("g:quickhl_colors")
 endif
 
 let s:default_settings = {
-      \ "g:quickhltag_enable_at_startup": 0,
-      \ "g:quickhltag_hl_priority": 9,
-      \ "g:quickhlcword_enable_at_startup": 0,
-      \ "g:quickhluser_enable_at_startup": 0,
-      \ "g:quickhl_keywords": [],
+      \ "g:quickhl_tag_enable_at_startup": 0,
+      \ "g:quickhl_tag_hl_priority": 9,
+      \ "g:quickhl_cword_enable_at_startup": 0,
+      \ "g:quickhl_manual_enable_at_startup": 0,
+      \ "g:quickhl_manual_keywords": [],
       \ }
 
 function! s:set_default(dict)
@@ -74,55 +74,54 @@ call s:set_default(s:default_settings)
 "}}}
 
 " Keymap: {{{
-nnoremap <silent> <Plug>(quickhl-user-toggle) :call quickhl#user_toggle('n')<CR>
-vnoremap <silent> <Plug>(quickhl-user-toggle) :call quickhl#user_toggle('v')<CR>
-nnoremap <silent> <Plug>(quickhl-user-reset)  :call quickhl#user_reset()<CR>
-vnoremap <silent> <Plug>(quickhl-user-reset)  :call quickhl#user_reset()<CR>
+nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#toggle('n')<CR>
+vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#toggle('v')<CR>
+nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
+vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 
-command!                QuickhlList           :call quickhl#user_list()
-command!                QuickhlDump           :call quickhl#user_dump()
-command!                QuickhlReset          :call quickhl#user_reset()
-command!                QuickhlColors         :call quickhl#user_colors()
-command! -bang -nargs=1 QuickhlAdd            :call quickhl#user_add(<q-args>,<bang>0)
-command! -bang -nargs=* QuickhlDel            :call quickhl#user_del(<q-args>,<bang>0)
-command!                QuickhlUserEnable     :call quickhl#user_enable()
-command!                QuickhlUserDisable    :call quickhl#user_disable()
+command!                QuickhlManualList       :call quickhl#manual#list()
+"command!                QuickhlManualDump       :call quickhl#manual#dump()
+command!                QuickhlManualReset      :call quickhl#manual#reset()
+command!                QuickhlManualColors     :call quickhl#manual#colors()
+command! -bang -nargs=1 QuickhlManualAdd        :call quickhl#manual#add(<q-args>,<bang>0)
+command! -bang -nargs=* QuickhlManualDel        :call quickhl#manual#del(<q-args>,<bang>0)
+command!                QuickhlManualEnable     :call quickhl#manual#enable()
+command!                QuickhlManualDisable    :call quickhl#manual#disable()
 
 
-nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword_toggle()<CR>
-nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword_enable()<CR>
-nnoremap <silent> <Plug>(quickhl-cword-disable) :call quickhl#cword_disable()<CR>
+nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>
+nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword#enable()<CR>
+nnoremap <silent> <Plug>(quickhl-cword-disable) :call quickhl#cword#disable()<CR>
 
-command! QuickhlCwordToggle  :call quickhl#cword_toggle()
-command! QuickhlCwordEnable  :call quickhl#cword_enable()
-command! QuickhlCwordDisable :call quickhl#cword_disable()
+command! QuickhlCwordToggle  :call quickhl#cword#toggle()
+command! QuickhlCwordEnable  :call quickhl#cword#enable()
+command! QuickhlCwordDisable :call quickhl#cword#disable()
 
-nnoremap <silent> <Plug>(quickhl-tag-toggle)     :call quickhl#tag_toggle()<CR>
-nnoremap <silent> <Plug>(quickhl-tag-enable)     :call quickhl#tag_enable()<CR>
-nnoremap <silent> <Plug>(quickhl-tag-disable)    :call quickhl#tag_disable()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-toggle)     :call quickhl#tag#toggle()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-enable)     :call quickhl#tag#enable()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-disable)    :call quickhl#tag#disable()<CR>
 
-command! QuickhlTagToggle   :call quickhl#tag_toggle()
-command! QuickhlTagEnable   :call quickhl#tag_enable()
-command! QuickhlTagDisable  :call quickhl#tag_disable()
-
+command! QuickhlTagToggle   :call quickhl#tag#toggle()
+command! QuickhlTagEnable   :call quickhl#tag#enable()
+command! QuickhlTagDisable  :call quickhl#tag#disable()
 "}}}
 
 " AutoCmd: {{{
-augroup QuickhlHL
+augroup QuickhlManual
   autocmd!
-  autocmd VimEnter,WinEnter * call quickhl#user_refresh()
+  autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
   autocmd TabEnter *
         \   if exists(':Tcolorscheme')
-        \ |   call quickhl#init_highlight()
+        \ |   call quickhl#manual#init_highlight()
         \ | endif
-  autocmd! ColorScheme * call quickhl#user_init_highlight()
+  autocmd! ColorScheme * call quickhl#manual#init_highlight()
 augroup END
 
-if g:quickhlcword_enable_at_startup
-  call quickhl#cword_enable()
+if g:quickhl_cword_enable_at_startup
+  call quickhl#cword#enable()
 endif
-if g:quickhltag_enable_at_startup
-  call quickhl#tag_enable()
+if g:quickhl_tag_enable_at_startup
+  call quickhl#tag#enable()
 endif
 "}}}
 
