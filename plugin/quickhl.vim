@@ -46,7 +46,6 @@ if !exists("g:quickhl_colors")
         \ "gui=bold ctermfg=7   ctermbg=50  guibg=#1060a0 guifg=#ffffff",
         \ "gui=bold ctermfg=7   ctermbg=56  guibg=#a0b0c0 guifg=black",
         \ ]
-  " let g:quickhl_match_color = "gui=underline cterm=underline term=underline"
   let g:quickhl_match_color = "term=underline cterm=underline guibg=#293739"
 endif
 

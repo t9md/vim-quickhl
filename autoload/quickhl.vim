@@ -17,7 +17,6 @@ function! s:report_error(error) "{{{
   echohl None
 endfunction "}}}
 
-let s:metachar = '\/~ .*^[''$'
 function! s:escape(pattern) "{{{
   return escape(a:pattern, s:metachar)
 endfunction "}}}
@@ -44,50 +43,58 @@ endfunction "}}}
 " }}}
 
 " MAIN: {{{
-let s:o = { }
+let s:metachar = '\/~ .*^[''$'
+
+let s:user = { }
 let s:hl_name_tag = "QuickhlTag"
 let s:hl_name_hl = 'Quickhl\d'
 " default 10, 
-let s:hl_priority = 9
-let g:underlinetag_enable = 0
+let s:quickhltag_hl_priority = 9
+let g:quichltag_enable = 0
 
-
-
-function! s:set_hl() "{{{
-  call map(taglist('.*'), 'matchadd(s:hl_name_tag, v:val.name, s:hl_priority)')
+let s:tag = {
+      \ "hl_name": "QuickhlTag",
+      \ "hl_priority": s:quickhltag_hl_priority,
+      \ }
+function! s:tag.set_hl() "{{{
+  call map(taglist('.*'), 'matchadd("'. self.hl_name . '", v:val.name, self.hl_priority)')
 endfunction "}}}
 
-function! s:clear_hl() "{{{
-  call map(map(s:our_match(s:hl_name_tag), 'v:val.id'), 'matchdelete(v:val)')
+function! s:tag.clear_hl() "{{{
+  call map(map(s:our_match(self.hl_name), 'v:val.id'), 'matchdelete(v:val)')
 endfunction "}}}
 
-function! s:refresh() "{{{
+function! s:tag.refresh() "{{{
   " only enable on normal(&buftype is empty) buffer.
   if !empty(&buftype) | return | endif
-  call s:clear_hl()
-  if !g:underlinetag_enable | return | endif
-  call s:set_hl()
+  call self.clear_hl()
+  if !g:quichltag_enable | return | endif
+  call self.set_hl()
 endfunction "}}}
 
+function! s:refresh()
+  call s:tag.refresh()
+endfunction
+
 function! quickhl#tag_enable() "{{{
-  let g:underlinetag_enable = 1
+  let g:quichltag_enable = 1
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_disable() "{{{
-  let g:underlinetag_enable = 0
+  let g:quichltag_enable = 0
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_toggle() "{{{
-  let g:underlinetag_enable = !g:underlinetag_enable
+  let g:quichltag_enable = !g:quichltag_enable
   call quickhl#tag_do()
 endfunction "}}}
 
 function! quickhl#tag_do() "{{{
-  augroup UnderlineTag
+  augroup QuickhlTag
     autocmd!
-    if g:underlinetag_enable
+    if g:quichltag_enable
       autocmd VimEnter,WinEnter * call quickhl#tag_refresh()
     endif
   augroup END
@@ -99,7 +106,7 @@ function! quickhl#tag_refresh() "{{{
   call s:windo(function('s:refresh'))
 endfunction "}}}
 
-function! s:o.dump() "{{{
+function! s:user.dump() "{{{
   if !exists("*PP")
     echoerr "need prettyprint.vim"
     return
@@ -107,7 +114,7 @@ function! s:o.dump() "{{{
   echo PP(self)
 endfunction "}}}
 
-function! s:o.init() "{{{
+function! s:user.init() "{{{
   let  self.idx = 0
   let  self.colors = s:read_colors(g:quickhl_colors)
   call self.init_highlight()
@@ -115,7 +122,7 @@ function! s:o.init() "{{{
   call self.refresh()
 endfunction "}}}
 
-function! s:o.init_highlight() "{{{
+function! s:user.init_highlight() "{{{
   " [TODO] should update(extend()) with new color but don't change other
   " fields.
   " let self.colors = s:read_colors(g:quickhl_colors)
@@ -125,7 +132,7 @@ function! s:o.init_highlight() "{{{
   endfor
 endfunction "}}}
 
-function! s:o.inject_keywords() "{{{
+function! s:user.inject_keywords() "{{{
   for keyword in g:quickhl_keywords
     if type(keyword) == type("")
       call self.add(keyword, 0)
@@ -146,7 +153,7 @@ function! s:clear_match() "{{{
   endfor
 endfunction "}}}
 
-function! s:o.reset() "{{{
+function! s:user.reset() "{{{
   for color in self.colors
     let color.pattern = ""
   endfor
@@ -155,7 +162,7 @@ function! s:o.reset() "{{{
   call self.inject_keywords()
 endfunction "}}}
 
-function! s:o.refresh() "{{{
+function! s:user.refresh() "{{{
   call s:windo(function('s:refresh_match'))
 endfunction "}}}
 
@@ -195,7 +202,7 @@ function! s:refresh_match() "{{{
     return
   endif
   call s:clear_match()
-  for color in s:o.colors
+  for color in s:user.colors
     if !empty(color.pattern)
       call s:decho(color.pattern)
     endif
@@ -209,11 +216,11 @@ function! s:refresh_match() "{{{
   endfor
 endfunction "}}}
 
-function! s:o.inc_idx() "{{{
+function! s:user.inc_idx() "{{{
   let self.idx = (self.idx + 1) % len(self.colors)
 endfunction "}}}
 
-function! s:o.show_colors() "{{{
+function! s:user.show_colors() "{{{
   for color in self.colors
     call s:exe("highlight " . color.name)
   endfor
@@ -228,7 +235,7 @@ function! s:has_match(pattern) "{{{
   return 0
 endfunction "}}}
 
-function! s:o.add(pattern, regexp) "{{{
+function! s:user.add(pattern, regexp) "{{{
   let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
   if s:has_match(pattern)
     call s:decho("duplicate: " . pattern)
@@ -240,7 +247,7 @@ function! s:o.add(pattern, regexp) "{{{
   call self.inc_idx()
 endfunction "}}}
 
-function! s:o.del(pattern, regexp) "{{{
+function! s:user.del(pattern, regexp) "{{{
   let pattern = a:regexp ? a:pattern : s:escape(a:pattern)
   if s:has_match(pattern)
     call s:decho("del: " . pattern)
@@ -254,7 +261,7 @@ function! s:o.del(pattern, regexp) "{{{
   endif
 endfunction "}}}
 
-function! s:o.del_by_index(idx) "{{{
+function! s:user.del_by_index(idx) "{{{
   let color = get(self.colors, a:idx, {})
   if !empty(color) && !empty(color.pattern)
     let self.colors[a:idx].pattern = ""
@@ -263,7 +270,7 @@ function! s:o.del_by_index(idx) "{{{
   endif
 endfunction "}}}
 
-function! s:o.list() "{{{
+function! s:user.list() "{{{
   for idx in range(len(self.colors))
     let color = self.colors[idx]
     if color.pattern == ""
@@ -277,16 +284,16 @@ function! s:o.list() "{{{
   endfor
 endfunction "}}}
 
-function! s:o.toggle(pattern) "{{{
+function! s:user.toggle(pattern) "{{{
   if !s:has_match(s:escape(a:pattern))
     call self.add(a:pattern, 0)
   else
     call self.del(a:pattern, 0)
   endif
-  call s:o.refresh()
+  call s:user.refresh()
 endfunction "}}}
 
-call s:o.init()
+call s:user.init()
 "}}}
 
 " PublicInterface: {{{
@@ -299,7 +306,7 @@ function! quickhl#toggle(mode) "{{{
     return
   endif
   call s:decho("[toggle] " . pattern)
-  call s:o.toggle(pattern)
+  call s:user.toggle(pattern)
 endfunction "}}}
 
 function! quickhl#match(action) "{{{
@@ -346,7 +353,7 @@ function! quickhl#match_auto(action) "{{{
 endfunction "}}}
 
 function! quickhl#list() "{{{
-  call s:o.list()
+  call s:user.list()
 endfunction "}}}
 
 function! quickhl#lock() "{{{
@@ -360,42 +367,42 @@ function! quickhl#unlock() "{{{
 endfunction "}}}
 
 function! quickhl#dump() "{{{
-  call s:o.dump()
+  call s:user.dump()
 endfunction "}}}
 
 function! quickhl#reset() "{{{
-  call s:o.reset()
+  call s:user.reset()
 endfunction "}}}
 
 function! quickhl#add(pattern, regexp) "{{{
-  call s:o.add(a:pattern, a:regexp)
-  call s:o.refresh()
+  call s:user.add(a:pattern, a:regexp)
+  call s:user.refresh()
 endfunction "}}}
 
 function! quickhl#del(pattern, regexp) "{{{
   if empty(a:pattern)
-    call s:o.list()
+    call s:user.list()
     let index = input("index to delete: ")
     if empty(index)
       return
     endif
-    call s:o.del_by_index(index)
+    call s:user.del_by_index(index)
   else
-    call s:o.del(a:pattern, a:regexp)
+    call s:user.del(a:pattern, a:regexp)
   endif
-  call s:o.refresh()
+  call s:user.refresh()
 endfunction "}}}
 
 function! quickhl#colors() "{{{
-  call s:o.show_colors()
+  call s:user.show_colors()
 endfunction "}}}
 
 function! quickhl#refresh() "{{{
-  call s:o.refresh()
+  call s:user.refresh()
 endfunction "}}}
 
 function! quickhl#init_highlight() "{{{
-  call s:o.init_highlight()
+  call s:user.init_highlight()
 endfunction "}}}
 "}}}
 
