@@ -45,6 +45,59 @@ endfunction "}}}
 
 " MAIN: {{{
 let s:o = { }
+let s:hl_name_tag = "QuickhlTag"
+let s:hl_name_hl = 'Quickhl\d'
+" default 10, 
+let s:hl_priority = 9
+let g:underlinetag_enable = 0
+
+
+
+function! s:set_hl() "{{{
+  call map(taglist('.*'), 'matchadd(s:hl_name_tag, v:val.name, s:hl_priority)')
+endfunction "}}}
+
+function! s:clear_hl() "{{{
+  call map(map(s:our_match(s:hl_name_tag), 'v:val.id'), 'matchdelete(v:val)')
+endfunction "}}}
+
+function! s:refresh() "{{{
+  " only enable on normal(&buftype is empty) buffer.
+  if !empty(&buftype) | return | endif
+  call s:clear_hl()
+  if !g:underlinetag_enable | return | endif
+  call s:set_hl()
+endfunction "}}}
+
+function! quickhl#tag_enable() "{{{
+  let g:underlinetag_enable = 1
+  call quickhl#tag_do()
+endfunction "}}}
+
+function! quickhl#tag_disable() "{{{
+  let g:underlinetag_enable = 0
+  call quickhl#tag_do()
+endfunction "}}}
+
+function! quickhl#tag_toggle() "{{{
+  let g:underlinetag_enable = !g:underlinetag_enable
+  call quickhl#tag_do()
+endfunction "}}}
+
+function! quickhl#tag_do() "{{{
+  augroup UnderlineTag
+    autocmd!
+    if g:underlinetag_enable
+      autocmd VimEnter,WinEnter * call quickhl#tag_refresh()
+    endif
+  augroup END
+
+  call quickhl#tag_refresh()
+endfunction "}}}
+
+function! quickhl#tag_refresh() "{{{
+  call s:windo(function('s:refresh'))
+endfunction "}}}
 
 function! s:o.dump() "{{{
   if !exists("*PP")
@@ -83,12 +136,12 @@ function! s:o.inject_keywords() "{{{
   endfor
 endfunction "}}}
 
-function! s:our_match() "{{{
-  return filter(getmatches(), 'v:val.group =~# "Quickhl\\d"')
+function! s:our_match(pattern) "{{{
+  return filter(getmatches(), "v:val.group =~# '". a:pattern . "'")
 endfunction "}}}
 
 function! s:clear_match() "{{{
-  for id in map(s:our_match(), 'v:val.id')
+  for id in map(s:our_match(s:hl_name_hl), 'v:val.id')
     call matchdelete(id)
   endfor
 endfunction "}}}
@@ -106,36 +159,36 @@ function! s:o.refresh() "{{{
   call s:windo(function('s:refresh_match'))
 endfunction "}}}
 
-function! s:set_winvar()
+function! s:set_winvar() "{{{
   for n in map(range(winnr('$')), 'v:val+1')
     call setwinvar(n, "quickhl_winno", n)
   endfor
-endfunction
+endfunction "}}}
 
-function! s:get_winvar()
+function! s:get_winvar() "{{{
   for n in map(range(winnr('$')), 'v:val+1')
     let here = n == winnr() ? " <==" : ''
     echo n . ":". getwinvar(n, "quickhl_winno", -1) . here
   endfor
-endfunction
+endfunction "}}}
 
-function! s:find_win(num)
+function! s:find_win(num) "{{{
   for n in map(range(winnr('$')), 'v:val+1')
     if getwinvar(n, "quickhl_winno", -1)  == a:num
       return n
     endif
   endfor
   return -1
-endfunction
+endfunction "}}}
 
-function! s:windo(func)
+function! s:windo(func) "{{{
   let winnum = winnr()
   let pwinnum = winnr('#')
   " echo [pwinnum, winnum]
   noautocmd windo call a:func()
   execute pwinnum . "wincmd w"
   execute winnum . "wincmd w"
-endfunction
+endfunction "}}}
 
 function! s:refresh_match() "{{{
   if exists("b:quickhl_lock")
@@ -167,7 +220,7 @@ function! s:o.show_colors() "{{{
 endfunction "}}}
 
 function! s:has_match(pattern) "{{{
-  for m in s:our_match()
+  for m in s:our_match(s:hl_name_hl)
     if m.pattern == a:pattern
       return 1
     endif

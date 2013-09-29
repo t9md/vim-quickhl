@@ -23,6 +23,10 @@ let g:loaded_quickhl = 1
 
 let s:old_cpo = &cpo
 set cpo&vim
+
+if !hlexists("QuickhlTag")
+  highlight QuickhlTag gui=underline cterm=underline term=underline
+endif
 "}}}
 
 " GlobalVar: {{{
@@ -60,6 +64,10 @@ vnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
 
 nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match("toggle")<CR>
 nnoremap <silent> <Plug>(quickhl-match-auto-toggle) :call quickhl#match_auto("toggle")<CR>
+
+nnoremap <silent> <Plug>(quickhl-tag-toggle) :call quickhl#tag_toggle()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-on)     :call quickhl#tag_enable()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-off)    :call quickhl#tag_disable()<CR>
 "}}}
 
 " Command: {{{
@@ -78,6 +86,10 @@ command! QuickhlMatchClear  :call quickhl#match("clear")
 command! QuickhlMatchAuto   :call <SID>quickhl_match_auto("on")
 command! QuickhlMatchNoAuto :call <SID>quickhl_match_auto("off")
 command! QuickhlMatchAutoToggle :call quickhl#match_auto("toggle")
+
+command! QuickhlTagToggle   :call quickhl#tag_toggle()
+command! QuickhlTagEnable   :call quickhl#tag_enable()
+command! QuickhlTagDisable  :call quickhl#tag_disable()
 "}}}
 
 " AutoCmd: {{{
@@ -91,7 +103,6 @@ augroup QuickhlHL
         \ | endif
   autocmd! ColorScheme * call quickhl#init_highlight()
 augroup END
-
 "}}}
 
 " FINISH: {{{
