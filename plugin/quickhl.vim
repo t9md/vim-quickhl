@@ -84,9 +84,9 @@ command!                QuickhlManualList       :call quickhl#manual#list()
 command!                QuickhlManualReset      :call quickhl#manual#reset()
 command!                QuickhlManualColors     :call quickhl#manual#colors()
 command! -bang -nargs=1 QuickhlManualAdd        :call quickhl#manual#add(<q-args>,<bang>0)
-command! -bang -nargs=* QuickhlManualDel        :call quickhl#manual#del(<q-args>,<bang>0)
-command!                QuickhlManualEnable     :call quickhl#manual#enable()
-command!                QuickhlManualDisable    :call quickhl#manual#disable()
+command! -bang -nargs=* QuickhlManualDelete     :call quickhl#manual#del(<q-args>,<bang>0)
+command!                QuickhlManualLock    :call quickhl#manual#lock()
+command!                QuickhlManualUnlock  :call quickhl#manual#unlock()
 
 
 nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>

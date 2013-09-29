@@ -10,7 +10,7 @@ function! s:exe(cmd) "{{{
 endfunction "}}}
 
 let s:manual = {
-      \ "name": 'Quickhl\d',
+      \ "name": 'QuickhlManual\d',
       \ "idx": 0,
       \ "enable": g:quickhl_manual_enable_at_startup,
       \ }
@@ -36,7 +36,7 @@ endfunction "}}}
 
 function! s:manual.read_colors(list) "{{{
   return map(copy(a:list), '{
-        \ "name": "Quickhl" . v:key,
+        \ "name": "QuickhlManual" . v:key,
         \ "val": v:val,
         \ "pattern": "",
         \ "regexp": 0,
@@ -87,7 +87,7 @@ endfunction "}}}
 
 function! s:manual.refresh() "{{{
   call self.clear()
-  " if ! self.enable | return | endif
+  if exists("b:quickhl_manual_lock") | return | endif
   call self.set()
 endfunction "}}}
 
@@ -181,13 +181,13 @@ function! quickhl#manual#list() "{{{
   call s:manual.list()
 endfunction "}}}
 
-function! quickhl#manual#enable() "{{{
-  let s:manual.enable = 1
-  call quickhl#manual#refresh()
+function! quickhl#manual#lock() "{{{
+  let b:quickhl_manual_lock = 1
+  call s:manual.clear()
 endfunction "}}}
 
-function! quickhl#manual#disable() "{{{
-  let s:manual.enable = 0
+function! quickhl#manual#unlock() "{{{
+  unlet! b:quickhl_manual_lock
   call quickhl#manual#refresh()
 endfunction "}}}
 
