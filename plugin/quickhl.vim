@@ -27,6 +27,7 @@ set cpo&vim
 if !hlexists("QuickhlTag")
   highlight QuickhlTag gui=underline cterm=underline term=underline
 endif
+
 if !hlexists("QuickhlCword")
   highlight link QuickhlCword Search
 endif
@@ -53,11 +54,11 @@ if !exists("g:quickhl_manual_colors")
 endif
 
 let s:default_settings = {
+      \ "g:quickhl_manual_enable_at_startup": 0,
+      \ "g:quickhl_manual_keywords": [],
       \ "g:quickhl_tag_enable_at_startup": 0,
       \ "g:quickhl_tag_hl_priority": 9,
       \ "g:quickhl_cword_enable_at_startup": 0,
-      \ "g:quickhl_manual_enable_at_startup": 0,
-      \ "g:quickhl_manual_keywords": [],
       \ }
 
 function! s:set_default(dict)
