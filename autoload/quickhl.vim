@@ -11,11 +11,11 @@ function! s:get_selected_text() "{{{
   endtry
 endfunction "}}}
 
-function! s:report_error(error)
+function! s:report_error(error) "{{{
 	echohl WarningMsg
   echomsg 'quickhl:  ' . a:error
   echohl None
-endfunction
+endfunction "}}}
 
 let s:metachar = '\/~ .*^[''$'
 function! s:escape(pattern) "{{{
@@ -23,18 +23,12 @@ function! s:escape(pattern) "{{{
 endfunction "}}}
 
 function! s:read_colors(list) "{{{
-  let colors = []
-  let index = 0
-  while index < len(a:list)
-    call add(colors, {
-          \ "name": "Quickhl" . index,
-          \ "val": a:list[index],
-          \ "pattern": "",
-          \ "regexp": 0,
-          \ })
-    let index += 1
-  endwhile
-  return colors
+  return map(copy(a:list), '{
+        \ "name": "Quickhl" . v:key,
+        \ "val": v:val,
+        \ "pattern": "",
+        \ "regexp": 0,
+        \ }')
 endfunction "}}}
 
 function! s:decho(msg) "{{{
@@ -50,7 +44,8 @@ endfunction "}}}
 " }}}
 
 " MAIN: {{{
-let s:o = {}
+let s:o = { }
+
 function! s:o.dump() "{{{
   if !exists("*PP")
     echoerr "need prettyprint.vim"
@@ -60,18 +55,21 @@ function! s:o.dump() "{{{
 endfunction "}}}
 
 function! s:o.init() "{{{
-  let self.idx = 0
-  let self.colors = s:read_colors(g:quickhl_colors)
+  let  self.idx = 0
+  let  self.colors = s:read_colors(g:quickhl_colors)
   call self.init_highlight()
   call self.inject_keywords()
+  call self.refresh()
 endfunction "}}}
 
 function! s:o.init_highlight() "{{{
+  " [TODO] should update(extend()) with new color but don't change other
+  " fields.
+  " let self.colors = s:read_colors(g:quickhl_colors)
   for color in self.colors
     let cmd = 'highlight ' . color.name . ' ' . color.val
     call s:exe(cmd)
   endfor
-  " call self.inject_keywords()
 endfunction "}}}
 
 function! s:o.inject_keywords() "{{{
@@ -108,9 +106,32 @@ function! s:o.refresh() "{{{
   call s:windo(function('s:refresh_match'))
 endfunction "}}}
 
+function! s:set_winvar()
+  for n in map(range(winnr('$')), 'v:val+1')
+    call setwinvar(n, "quickhl_winno", n)
+  endfor
+endfunction
+
+function! s:get_winvar()
+  for n in map(range(winnr('$')), 'v:val+1')
+    let here = n == winnr() ? " <==" : ''
+    echo n . ":". getwinvar(n, "quickhl_winno", -1) . here
+  endfor
+endfunction
+
+function! s:find_win(num)
+  for n in map(range(winnr('$')), 'v:val+1')
+    if getwinvar(n, "quickhl_winno", -1)  == a:num
+      return n
+    endif
+  endfor
+  return -1
+endfunction
+
 function! s:windo(func)
   let winnum = winnr()
   let pwinnum = winnr('#')
+  " echo [pwinnum, winnum]
   noautocmd windo call a:func()
   execute pwinnum . "wincmd w"
   execute winnum . "wincmd w"
@@ -164,7 +185,6 @@ function! s:o.add(pattern, regexp) "{{{
   let self.colors[self.idx].pattern = pattern
   let self.colors[self.idx].regexp  = a:regexp
   call self.inc_idx()
-  call self.refresh()
 endfunction "}}}
 
 function! s:o.del(pattern, regexp) "{{{
@@ -179,7 +199,6 @@ function! s:o.del(pattern, regexp) "{{{
   else
     call s:report_error("pattern not found: " . string(pattern))
   endif
-  call self.refresh()
 endfunction "}}}
 
 function! s:o.del_by_index(idx) "{{{
@@ -189,7 +208,6 @@ function! s:o.del_by_index(idx) "{{{
   else
     call s:report_error("index not found: " . a:idx)
   endif
-  call self.refresh()
 endfunction "}}}
 
 function! s:o.list() "{{{
@@ -212,6 +230,7 @@ function! s:o.toggle(pattern) "{{{
   else
     call self.del(a:pattern, 0)
   endif
+  call s:o.refresh()
 endfunction "}}}
 
 call s:o.init()
@@ -237,7 +256,7 @@ function! quickhl#match(action) "{{{
     return
   endif
 
-  let pattern = expand('<cword>')
+  let pattern = s:escape(expand('<cword>'))
   if a:action == 'toggle'
     if exists('b:quickhlmatch_pattern')
           \ && b:quickhlmatch_pattern == pattern
@@ -248,8 +267,29 @@ function! quickhl#match(action) "{{{
   endif
 
   let b:quickhlmatch_pattern = pattern
-  highlight QuickhlMatch gui=undercurl guisp=Cyan
+  " exe "highlight QuickhlMatch " . g:quickhl_match_color
+
+  exe "highlight link QuickhlMatch Search"
   exe "match QuickhlMatch /". b:quickhlmatch_pattern . "/"
+endfunction "}}}
+
+function! quickhl#match_auto(action) "{{{
+  if a:action == 'clear' || a:action == "toggle" && exists("b:quickhlmatch_pattern")
+    call quickhl#match("clear")
+    if exists("#QuickhlMatch")
+      augroup QuickhlMatch
+        autocmd!
+      augroup END
+      augroup! QuickhlMatch
+    endif
+    return
+  endif
+
+  call quickhl#match("on")
+  augroup QuickhlMatch
+    autocmd!
+    autocmd! CursorMoved <buffer> call quickhl#match("on")
+  augroup END
 endfunction "}}}
 
 function! quickhl#list() "{{{
@@ -276,6 +316,7 @@ endfunction "}}}
 
 function! quickhl#add(pattern, regexp) "{{{
   call s:o.add(a:pattern, a:regexp)
+  call s:o.refresh()
 endfunction "}}}
 
 function! quickhl#del(pattern, regexp) "{{{
@@ -289,6 +330,7 @@ function! quickhl#del(pattern, regexp) "{{{
   else
     call s:o.del(a:pattern, a:regexp)
   endif
+  call s:o.refresh()
 endfunction "}}}
 
 function! quickhl#colors() "{{{

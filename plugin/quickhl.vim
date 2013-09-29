@@ -8,17 +8,17 @@
 
 " GUARD: {{{
 "============================================================
-if exists('g:quickhl_dev')
-  unlet! g:loaded_quickhl
-endif
+" if exists('g:quickhl_dev')
+  " unlet! g:loaded_quickhl
+" endif
 
-if !exists('g:quickhl_debug')
+" if !exists('g:quickhl_debug')
   let g:quickhl_debug = 0
-endif
+" endif
 
-if exists('g:loaded_quickhl')
-  finish
-endif
+" if exists('g:loaded_quickhl')
+  " finish
+" endif
 let g:loaded_quickhl = 1
 
 let s:old_cpo = &cpo
@@ -42,6 +42,8 @@ if !exists("g:quickhl_colors")
         \ "gui=bold ctermfg=7   ctermbg=50  guibg=#1060a0 guifg=#ffffff",
         \ "gui=bold ctermfg=7   ctermbg=56  guibg=#a0b0c0 guifg=black",
         \ ]
+  " let g:quickhl_match_color = "gui=underline cterm=underline term=underline"
+  let g:quickhl_match_color = "term=underline cterm=underline guibg=#293739"
 endif
 
 if !exists("g:quickhl_keywords")
@@ -57,6 +59,7 @@ nnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-reset)  :call quickhl#reset()<CR>
 
 nnoremap <silent> <Plug>(quickhl-match) :call quickhl#match("toggle")<CR>
+nnoremap <silent> <Plug>(quickhl-match-auto-toggle) :call quickhl#match_auto("toggle")<CR>
 "}}}
 
 " Command: {{{
@@ -72,23 +75,12 @@ command!                QuickhlUnLock         :call quickhl#unlock()
 
 command! QuickhlMatch       :call quickhl#match("on")
 command! QuickhlMatchClear  :call quickhl#match("clear")
-command! QuickhlMatchAuto   :call <SID>quickhl_match_auto()
-command! QuickhlMatchNoAuto :call <SID>quickhl_match_manual()
+command! QuickhlMatchAuto   :call <SID>quickhl_match_auto("on")
+command! QuickhlMatchNoAuto :call <SID>quickhl_match_auto("off")
+command! QuickhlMatchAutoToggle :call quickhl#match_auto("toggle")
 "}}}
 
 " AutoCmd: {{{
-function! s:quickhl_match_auto()
-  augroup QuickhlMatch
-      autocmd! CursorMoved <buffer> call quickhl#match("on")
-  augroup end
-endfunction
-
-function! s:quickhl_match_manual()
-  augroup QuickhlMatch
-      autocmd!
-  augroup end
-endfunction
-
 augroup QuickhlHL
   autocmd!
   autocmd VimEnter * call quickhl#refresh()
@@ -98,7 +90,7 @@ augroup QuickhlHL
         \ |   call quickhl#init_highlight()
         \ | endif
   autocmd! ColorScheme * call quickhl#init_highlight()
-augroup end
+augroup END
 
 "}}}
 
