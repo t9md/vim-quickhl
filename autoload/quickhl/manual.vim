@@ -218,8 +218,12 @@ function! quickhl#manual#colors() "{{{
   call s:manual.show_colors()
 endfunction "}}}
 
+function! quickhl#manual#_refresh() "{{{
+  call s:manual.refresh()
+endfunction
+
 function! quickhl#manual#refresh() "{{{
-  call quickhl#windo(function('s:manual_refresh'))
+  call quickhl#windo(s:manual.refresh, s:manual)
 endfunction "}}}
 
 function! quickhl#manual#init_highlight() "{{{

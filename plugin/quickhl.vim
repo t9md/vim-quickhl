@@ -50,7 +50,6 @@ if !exists("g:quickhl_manual_colors")
         \ "gui=bold ctermfg=7   ctermbg=50  guibg=#1060a0 guifg=#ffffff",
         \ "gui=bold ctermfg=7   ctermbg=56  guibg=#a0b0c0 guifg=black",
         \ ]
-  " let g:quickhl_match_color = "term=underline cterm=underline guibg=#293739"
 endif
 
 let s:default_settings = {
@@ -88,7 +87,6 @@ command! -bang -nargs=1 QuickhlManualAdd        :call quickhl#manual#add(<q-args
 command! -bang -nargs=* QuickhlManualDelete     :call quickhl#manual#del(<q-args>,<bang>0)
 command!                QuickhlManualLock    :call quickhl#manual#lock()
 command!                QuickhlManualUnlock  :call quickhl#manual#unlock()
-
 
 nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword#enable()<CR>

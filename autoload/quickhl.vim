@@ -25,11 +25,13 @@ function! quickhl#our_match(pattern) "{{{
   return filter(getmatches(), "v:val.group =~# '". a:pattern . "'")
 endfunction "}}}
 
-function! quickhl#windo(func) "{{{
+function! quickhl#windo(func, obj) "{{{
   let winnum = winnr()
   let pwinnum = winnr('#')
   " echo [pwinnum, winnum]
-  noautocmd windo call a:func()
+  " echo PP(a:func)
+  " echo PP(a:obj)
+  noautocmd windo call call(a:func, [], a:obj)
   execute pwinnum . "wincmd w"
   execute winnum . "wincmd w"
 endfunction "}}}

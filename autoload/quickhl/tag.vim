@@ -20,39 +20,35 @@ function! s:tag.refresh() "{{{
   call self.set()
 endfunction "}}}
 
-function! s:tag_refresh() "{{{
-  call s:tag.refresh()
-endfunction "}}}
-
 function! quickhl#tag#enable() "{{{
   let s:tag.enable = 1
-  call quickhl#tag#do()
-endfunction "}}}
-
-function! quickhl#tag#disable() "{{{
-  let s:tag.enable = 0
-  call quickhl#tag#do()
-endfunction "}}}
-
-function! quickhl#tag#toggle() "{{{
-  let s:tag.enable = !s:tag.enable
-  call quickhl#tag#do()
-endfunction "}}}
-
-function! quickhl#tag#do() "{{{
   augroup QuickhlTag
     autocmd!
-    if s:tag.enable
-      " autocmd VimEnter,WinEnter * call quickhl#tag#refresh()
-      autocmd BufEnter,WinEnter * call quickhl#tag#refresh()
-    endif
+    autocmd BufEnter,WinEnter * call quickhl#tag#refresh()
   augroup END
   call quickhl#tag#refresh()
 endfunction "}}}
 
-function! quickhl#tag#refresh() "{{{
-  " echo "called 1"
-  " echo "called 2"
-  call quickhl#windo(function('s:tag_refresh'))
+function! quickhl#tag#disable() "{{{
+  let s:tag.enable = 0
+  augroup QuickhlTag
+    autocmd!
+  augroup END
+  augroup! QuickhlTag
+  call quickhl#tag#refresh()
 endfunction "}}}
+
+function! quickhl#tag#toggle() "{{{
+  let s:tag.enable = !s:tag.enable
+  if s:cword.enable
+    call quickhl#tag#enable()
+  else
+    call quickhl#tag#disable()
+  endif
+endfunction "}}}
+
+function! quickhl#tag#refresh() "{{{
+  call quickhl#windo(s:tag.refresh, s:tag)
+endfunction "}}}
+
 " vim: foldmethod=marker
