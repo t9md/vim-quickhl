@@ -79,6 +79,9 @@ vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#toggle('v')
 nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 
+command!                QuickhlManualEnable       :call quickhl#manual#enable()
+command!                QuickhlManualDisable       :call quickhl#manual#disable()
+
 command!                QuickhlManualList       :call quickhl#manual#list()
 "command!                QuickhlManualDump       :call quickhl#manual#dump()
 command!                QuickhlManualReset      :call quickhl#manual#reset()
@@ -92,35 +95,27 @@ nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword#enable()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-disable) :call quickhl#cword#disable()<CR>
 
-command! QuickhlCwordToggle  :call quickhl#cword#toggle()
 command! QuickhlCwordEnable  :call quickhl#cword#enable()
 command! QuickhlCwordDisable :call quickhl#cword#disable()
+command! QuickhlCwordToggle  :call quickhl#cword#toggle()
 
-nnoremap <silent> <Plug>(quickhl-tag-toggle)     :call quickhl#tag#toggle()<CR>
 nnoremap <silent> <Plug>(quickhl-tag-enable)     :call quickhl#tag#enable()<CR>
 nnoremap <silent> <Plug>(quickhl-tag-disable)    :call quickhl#tag#disable()<CR>
+nnoremap <silent> <Plug>(quickhl-tag-toggle)     :call quickhl#tag#toggle()<CR>
 
-command! QuickhlTagToggle   :call quickhl#tag#toggle()
 command! QuickhlTagEnable   :call quickhl#tag#enable()
 command! QuickhlTagDisable  :call quickhl#tag#disable()
+command! QuickhlTagToggle   :call quickhl#tag#toggle()
 "}}}
-
-" AutoCmd: {{{
-augroup QuickhlManual
-  autocmd!
-  autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
-  autocmd TabEnter *
-        \   if exists(':Tcolorscheme')
-        \ |   call quickhl#manual#init_highlight()
-        \ | endif
-  autocmd! ColorScheme * call quickhl#manual#init_highlight()
-augroup END
 
 if g:quickhl_cword_enable_at_startup
   call quickhl#cword#enable()
 endif
 if g:quickhl_tag_enable_at_startup
   call quickhl#tag#enable()
+endif
+if g:quickhl_manual_enable_at_startup
+  call quickhl#manual#enable()
 endif
 "}}}
 
