@@ -40,7 +40,7 @@ endfunction "}}}
 
 function! quickhl#tag#toggle() "{{{
   let s:tag.enable = !s:tag.enable
-  if s:cword.enable
+  if s:tag.enable
     call quickhl#tag#enable()
   else
     call quickhl#tag#disable()
