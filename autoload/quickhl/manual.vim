@@ -11,14 +11,10 @@ endfunction "}}}
 
 let s:manual = {
       \ "name": 'QuickhlManual\d',
-      \ "idx": 0,
       \ "history": [],
+      \ "idx": 0,
       \ "enable": g:quickhl_manual_enable_at_startup,
       \ }
-
-function! s:manual_clear() "{{{
-  call s:manual.clear()
-endfunction "}}}
 
 function! s:manual.dump() "{{{
   if !exists("*PP")
@@ -29,10 +25,10 @@ function! s:manual.dump() "{{{
 endfunction "}}}
 
 function! s:manual.init() "{{{
-  " let  self.idx = 0
   let  self.colors = self.read_colors(g:quickhl_manual_colors)
   call self.init_highlight()
   call self.inject_keywords()
+  let self.history = []
 endfunction "}}}
 
 function! s:manual.read_colors(list) "{{{
@@ -64,10 +60,16 @@ function! s:manual.inject_keywords() "{{{
   endfor
 endfunction "}}}
 
+function! Test() "{{{
+  " echo PP(s:manual.colors)
+endfunction "}}}
+
 function! s:manual.set() "{{{
-  for color in self.colors
+  " call map(self.colors, 'matchadd(v:val.name, v:val.pattern)')
+  " call map(self.colors, 'matchadd( v:val.name , v:val.pattern )')
+  for color in self.colors "{{{
     call matchadd(color.name, color.pattern)
-  endfor
+  endfor "}}}
 endfunction "}}}
 
 function! s:manual.clear() "{{{
@@ -78,12 +80,11 @@ function! s:manual.reset() "{{{
   for color in self.colors
     let color.pattern = ""
   endfor
-  let self.history = []
   call quickhl#manual#refresh()
-  " let self.idx = 0
   if self.enable
     call self.inject_keywords()
   endif
+  let self.history = []
 endfunction "}}}
 
 function! s:manual.refresh() "{{{
@@ -98,18 +99,11 @@ function! s:manual.show_colors() "{{{
   endfor
 endfunction "}}}
 
-function! s:manual.has_match(pattern) "{{{
-  for m in quickhl#our_match(self.name)
-    if m.pattern == a:pattern | return 1 | endif
-  endfor
-  return 0
-endfunction "}}}
-
 function! s:manual.add(pattern, regexp) "{{{
   let pattern = a:regexp ? a:pattern : quickhl#escape(a:pattern)
-  if self.has_match(pattern)
+
+  if !( s:manual.index_of(pattern) >= 0 )
     call s:decho("duplicate: " . pattern)
-    return
   endif
   call s:decho("new: " . pattern)
   let idx = self.next_index()
@@ -142,25 +136,12 @@ function! s:manual.del(pattern, regexp) "{{{
   endif
   call self.del_by_index(index)
   call remove(self.history, index(self.history, index))
-  " if self.has_match(pattern) "{{{
-    " call s:decho("del: " . pattern)
-    " for color in self.colors
-      " if color.pattern == pattern
-        " let color.pattern = ""
-      " endif
-    " endfor
-  " else
-    " call quickhl#warn("pattern not found: " . string(pattern))
-  " endif "}}}
 endfunction "}}}
 
 function! s:manual.del_by_index(idx) "{{{
-  let color = get(self.colors, a:idx, {})
-  if !empty(color) && !empty(color.pattern)
-    let self.colors[a:idx].pattern = ""
-  else
-    call quickhl#warn("index not found: " . a:idx)
-  endif
+  if a:idx >= len(self.colors) | return | endif
+  let self.colors[a:idx].pattern = ''
+  let self.colors[a:idx].regexp = 0
 endfunction "}}}
 
 function! s:manual.list() "{{{
@@ -189,7 +170,7 @@ function! quickhl#manual#toggle(mode) "{{{
         \ ""
   if pattern == '' | return | endif
   call s:decho("[toggle] " . pattern)
-  if !s:manual.has_match(quickhl#escape(pattern))
+  if s:manual.index_of(quickhl#escape(pattern)) == -1
     call s:manual.add(pattern, 0)
   else
     call s:manual.del(pattern, 0)
@@ -258,7 +239,7 @@ function! quickhl#manual#enable() "{{{
           \ | endif
     autocmd! ColorScheme * call quickhl#manual#init_highlight()
   augroup END
-  " call s:manual.init()
+  call s:manual.init()
   call quickhl#manual#refresh()
 endfunction "}}}
 
