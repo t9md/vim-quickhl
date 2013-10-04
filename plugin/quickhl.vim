@@ -8,17 +8,13 @@
 
 " GUARD: {{{
 "============================================================
-" if exists('g:quickhl_dev')
-  " unlet! g:loaded_quickhl
-" endif
-
-" if !exists('g:quickhl_debug')
+if !exists('g:quickhl_debug')
   let g:quickhl_debug = 0
-" endif
+endif
 
-" if exists('g:loaded_quickhl')
-  " finish
-" endif
+if exists('g:loaded_quickhl')
+  finish
+endif
 let g:loaded_quickhl = 1
 
 let s:old_cpo = &cpo
@@ -62,9 +58,7 @@ let s:default_settings = {
 
 function! s:set_default(dict)
   for [var, val] in items(a:dict)
-    if !exists(var)
-      let {var} = val
-    endif
+    if !exists(var) | let {var} = val | endif
     unlet! var val
   endfor
 endfunction

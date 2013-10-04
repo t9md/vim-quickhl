@@ -36,7 +36,7 @@ function! s:manual.read_colors(list) "{{{
         \ "name": "QuickhlManual" . v:key,
         \ "val": v:val,
         \ "pattern": "",
-        \ "regexp": 0,
+        \ "escaped": 0,
         \ }')
 endfunction "}}}
 
@@ -50,7 +50,11 @@ function! s:manual.init_highlight() "{{{
 endfunction "}}}
 
 function! s:manual.inject_keywords() "{{{
-  for keyword in g:quickhl_manual_keywords
+  call self._inject_keywords( g:quickhl_manual_keywords )
+endfunction "}}}
+
+function! s:manual._inject_keywords(keywords) "{{{
+  for keyword in a:keywords
     if type(keyword) == type("")
       call self.add(keyword, 0)
     elseif type(keyword) == type({})
@@ -60,16 +64,9 @@ function! s:manual.inject_keywords() "{{{
   endfor
 endfunction "}}}
 
-function! Test() "{{{
-  " echo PP(s:manual.colors)
-endfunction "}}}
-
 function! s:manual.set() "{{{
-  " call map(self.colors, 'matchadd(v:val.name, v:val.pattern)')
-  " call map(self.colors, 'matchadd( v:val.name , v:val.pattern )')
-  for color in self.colors "{{{
-    call matchadd(color.name, color.pattern)
-  endfor "}}}
+  " call map(copy(self.colors), 'matchadd(v:val.name, v:val.pattern)')
+  for color in self.colors | call matchadd(color.name, color.pattern) | endfor
 endfunction "}}}
 
 function! s:manual.clear() "{{{
@@ -77,13 +74,9 @@ function! s:manual.clear() "{{{
 endfunction "}}}
 
 function! s:manual.reset() "{{{
-  for color in self.colors
-    let color.pattern = ""
-  endfor
+  for color in self.colors | let color.pattern = "" | endfor
   call quickhl#manual#refresh()
-  if self.enable
-    call self.inject_keywords()
-  endif
+  if self.enable | call self.inject_keywords() | endif
   let self.history = []
 endfunction "}}}
 
@@ -99,22 +92,21 @@ function! s:manual.show_colors() "{{{
   endfor
 endfunction "}}}
 
-function! s:manual.add(pattern, regexp) "{{{
-  let pattern = a:regexp ? a:pattern : quickhl#escape(a:pattern)
-
-  if !( s:manual.index_of(pattern) >= 0 )
+function! s:manual.add(pattern, escaped) "{{{
+  let pattern = a:escaped ? a:pattern : quickhl#escape(a:pattern)
+  if ( s:manual.index_of(pattern) >= 0 )
     call s:decho("duplicate: " . pattern)
+    return
   endif
   call s:decho("new: " . pattern)
-  let idx = self.next_index()
-  let self.colors[idx].pattern = pattern
-  let self.colors[idx].regexp  = a:regexp
-  call add(self.history, idx)
+  let i = self.next_index()
+  let self.colors[i].pattern = pattern
+  call add(self.history, i)
 endfunction "}}}
 
 function! s:manual.next_index() "{{{
   let index = self.index_of('')
-  return index != -1 ? index : remove(self.history, 0)
+  return ( index != -1 ? index : remove(self.history, 0) )
 endfunction "}}}
 
 function! s:manual.index_of(pattern) "{{{
@@ -126,30 +118,28 @@ function! s:manual.index_of(pattern) "{{{
   return -1
 endfunction "}}}
 
-function! s:manual.del(pattern, regexp) "{{{
-  let pattern = a:regexp ? a:pattern : quickhl#escape(a:pattern)
+function! s:manual.del(pattern, escaped) "{{{
+  let pattern = a:escaped ? a:pattern : quickhl#escape(a:pattern)
 
   let index = self.index_of(pattern)
+  call s:decho("[del ]: " . index)
   if index < 0
     call s:decho("Can't find for '" . a:val . "'" )
     return
   endif
   call self.del_by_index(index)
+  if empty(self.history) | return | endif
   call remove(self.history, index(self.history, index))
 endfunction "}}}
 
 function! s:manual.del_by_index(idx) "{{{
   if a:idx >= len(self.colors) | return | endif
   let self.colors[a:idx].pattern = ''
-  let self.colors[a:idx].regexp = 0
 endfunction "}}}
 
 function! s:manual.list() "{{{
   for idx in range(len(self.colors))
     let color = self.colors[idx]
-    " if color.pattern == ""
-      " continue
-    " endif
     exe "echohl " . color.name
     echo printf("%2d: ", idx)
     let cmd = "echon " . string(color.pattern)
@@ -171,8 +161,10 @@ function! quickhl#manual#toggle(mode) "{{{
   if pattern == '' | return | endif
   call s:decho("[toggle] " . pattern)
   if s:manual.index_of(quickhl#escape(pattern)) == -1
+    call s:decho("[toggle add]:" . pattern)
     call s:manual.add(pattern, 0)
   else
+    call s:decho("[toggle del]:" . pattern)
     call s:manual.del(pattern, 0)
   endif
   call quickhl#manual#refresh()
@@ -198,28 +190,26 @@ function! quickhl#manual#unlock() "{{{
 endfunction "}}}
 
 function! quickhl#manual#dump() "{{{
-  " call s:manual.dump()
-  echo s:manual.history
+  call s:manual.dump()
+  " echo s:manual.history
 endfunction "}}}
 
-function! quickhl#manual#add(pattern, regexp) "{{{
+function! quickhl#manual#add(pattern, escaped) "{{{
   if !s:manual.enable
     call quickhl#manual#enable()
   endif
-  call s:manual.add(a:pattern, a:regexp)
+  call s:manual.add(a:pattern, a:escaped)
   call quickhl#manual#refresh()
 endfunction "}}}
 
-function! quickhl#manual#del(pattern, regexp) "{{{
+function! quickhl#manual#del(pattern, escaped) "{{{
   if empty(a:pattern)
     call s:manual.list()
     let index = input("index to delete: ")
-    if empty(index)
-      return
-    endif
+    if empty(index) | return | endif
     call s:manual.del_by_index(index)
   else
-    call s:manual.del(a:pattern, a:regexp)
+    call s:manual.del(a:pattern, a:escaped)
   endif
   call quickhl#manual#refresh()
 endfunction "}}}
