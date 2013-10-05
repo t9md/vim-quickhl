@@ -36,11 +36,4 @@ function! quickhl#windo(func, obj) "{{{
   execute winnum . "wincmd w"
 endfunction "}}}
 
-" function! quickhl#set()
-" endfunction
-" function! quickhl#clear()
-" endfunction
-" function! quickhl#refresh()
-" endfunction
-
 " vim: foldmethod=marker

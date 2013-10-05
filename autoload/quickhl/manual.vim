@@ -9,11 +9,10 @@ function! s:exe(cmd) "{{{
   exe a:cmd
 endfunction "}}}
 
+
 let s:manual = {
       \ "name": 'QuickhlManual\d',
-      \ "history": [],
-      \ "idx": 0,
-      \ "enable": g:quickhl_manual_enable_at_startup,
+      \ "enabled": g:quickhl_manual_enable_at_startup,
       \ }
 
 function! s:manual.dump() "{{{
@@ -21,14 +20,13 @@ function! s:manual.dump() "{{{
     echoerr "need prettyprint.vim"
     return
   endif
-  echo PP(self)
+  echo PP(self.history)
 endfunction "}}}
 
 function! s:manual.init() "{{{
-  let  self.colors = self.read_colors(g:quickhl_manual_colors)
+  let self.colors = self.read_colors(g:quickhl_manual_colors)
+  let self.history = range(len(g:quickhl_manual_colors))
   call self.init_highlight()
-  call self.inject_keywords()
-  let self.history = []
 endfunction "}}}
 
 function! s:manual.read_colors(list) "{{{
@@ -41,11 +39,8 @@ function! s:manual.read_colors(list) "{{{
 endfunction "}}}
 
 function! s:manual.init_highlight() "{{{
-  " [TODO] should update(extend()) with new color but don't change other
-  " fields.
   for color in self.colors
-    let cmd = 'highlight ' . color.name . ' ' . color.val
-    call s:exe(cmd)
+    exe 'highlight ' . color.name . ' ' . color.val
   endfor
 endfunction "}}}
 
@@ -74,10 +69,9 @@ function! s:manual.clear() "{{{
 endfunction "}}}
 
 function! s:manual.reset() "{{{
-  for color in self.colors | let color.pattern = "" | endfor
+  call self.init()
   call quickhl#manual#refresh()
-  if self.enable | call self.inject_keywords() | endif
-  let self.history = []
+  if self.enabled | call self.inject_keywords() | endif
 endfunction "}}}
 
 function! s:manual.refresh() "{{{
@@ -105,8 +99,9 @@ function! s:manual.add(pattern, escaped) "{{{
 endfunction "}}}
 
 function! s:manual.next_index() "{{{
-  let index = self.index_of('')
-  return ( index != -1 ? index : remove(self.history, 0) )
+  " let index = self.index_of('')
+  " return ( index != -1 ? index : remove(self.history, 0) )
+  return remove(self.history, 0) 
 endfunction "}}}
 
 function! s:manual.index_of(pattern) "{{{
@@ -123,48 +118,56 @@ function! s:manual.del(pattern, escaped) "{{{
 
   let index = self.index_of(pattern)
   call s:decho("[del ]: " . index)
-  if index < 0
+  if index == -1
     call s:decho("Can't find for '" . a:val . "'" )
     return
   endif
   call self.del_by_index(index)
-  if empty(self.history) | return | endif
-  call remove(self.history, index(self.history, index))
 endfunction "}}}
 
 function! s:manual.del_by_index(idx) "{{{
   if a:idx >= len(self.colors) | return | endif
   let self.colors[a:idx].pattern = ''
+  call remove(self.history, index(self.history, a:idx))
+  call insert(self.history, a:idx, 0 )
 endfunction "}}}
 
 function! s:manual.list() "{{{
   for idx in range(len(self.colors))
     let color = self.colors[idx]
     exe "echohl " . color.name
-    echo printf("%2d: ", idx)
-    let cmd = "echon " . string(color.pattern)
-    exe cmd
+    echo printf("%2d: ", idx) . color.pattern
     echohl None
   endfor
 endfunction "}}}
 
-call s:manual.init()
+function! s:manual.setup_autocmd() "{{{
+  augroup QuickhlManual
+    autocmd!
+    if s:manual.enabled
+      autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
+      autocmd TabEnter *
+            \   if exists(':Tcolorscheme')
+            \ |   call quickhl#manual#init_highlight()
+            \ | endif
+      autocmd! ColorScheme * call quickhl#manual#init_highlight()
+    endif
+  augroup END
+endfunction "}}}
 
 function! quickhl#manual#toggle(mode) "{{{
-  if !s:manual.enable
-    call quickhl#manual#enable()
-  endif
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern = 
         \ a:mode == 'n' ? expand('<cword>') :
         \ a:mode == 'v' ? quickhl#get_selected_text() :
         \ ""
   if pattern == '' | return | endif
-  call s:decho("[toggle] " . pattern)
+  " call s:decho("[toggle] " . pattern)
   if s:manual.index_of(quickhl#escape(pattern)) == -1
-    call s:decho("[toggle add]:" . pattern)
+    " call s:decho("[toggle add]:" . pattern)
     call s:manual.add(pattern, 0)
   else
-    call s:decho("[toggle del]:" . pattern)
+    " call s:decho("[toggle del]:" . pattern)
     call s:manual.del(pattern, 0)
   endif
   call quickhl#manual#refresh()
@@ -195,9 +198,7 @@ function! quickhl#manual#dump() "{{{
 endfunction "}}}
 
 function! quickhl#manual#add(pattern, escaped) "{{{
-  if !s:manual.enable
-    call quickhl#manual#enable()
-  endif
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
   call s:manual.add(a:pattern, a:escaped)
   call quickhl#manual#refresh()
 endfunction "}}}
@@ -219,26 +220,16 @@ function! quickhl#manual#colors() "{{{
 endfunction "}}}
 
 function! quickhl#manual#enable() "{{{
-  let s:manual.enable = 1
-  augroup QuickhlManual
-    autocmd!
-    autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
-    autocmd TabEnter *
-          \   if exists(':Tcolorscheme')
-          \ |   call quickhl#manual#init_highlight()
-          \ | endif
-    autocmd! ColorScheme * call quickhl#manual#init_highlight()
-  augroup END
   call s:manual.init()
+  let  s:manual.enabled = 1
+  call s:manual.inject_keywords()
+  call s:manual.setup_autocmd()
   call quickhl#manual#refresh()
 endfunction "}}}
 
 function! quickhl#manual#disable() "{{{
-  let s:manual.enable = 0
-  augroup QuickhlManual
-    autocmd!
-  augroup END
-  augroup! QuickhlManual
+  let s:manual.enabled = 0
+  call s:manual.setup_autocmd()
   call quickhl#manual#reset()
 endfunction "}}}
 
@@ -247,12 +238,12 @@ function! quickhl#manual#refresh() "{{{
 endfunction "}}}
 
 function! quickhl#manual#status() "{{{
-  echo s:manual.enable
-  " call quickhl#windo(s:manual.refresh, s:manual)
+  echo s:manual.enabled
 endfunction "}}}
 
 function! quickhl#manual#init_highlight() "{{{
   call s:manual.init_highlight()
 endfunction "}}}
 
+call s:manual.init()
 " vim: foldmethod=marker

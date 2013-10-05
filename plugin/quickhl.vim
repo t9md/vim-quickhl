@@ -5,9 +5,7 @@
 " License: BSD
 " Version: 0.5
 "=============================================================================
-
 " GUARD: {{{
-"============================================================
 if !exists('g:quickhl_debug')
   let g:quickhl_debug = 0
 endif
@@ -19,15 +17,7 @@ let g:loaded_quickhl = 1
 
 let s:old_cpo = &cpo
 set cpo&vim
-
-if !hlexists("QuickhlTag")
-  highlight QuickhlTag gui=underline cterm=underline term=underline
-endif
-
-if !hlexists("QuickhlCword")
-  highlight link QuickhlCword Search
-endif
-"}}}
+" }}}
 
 " GlobalVar: {{{
 if !exists("g:quickhl_manual_colors")
@@ -52,16 +42,18 @@ let s:default_settings = {
       \ "g:quickhl_manual_enable_at_startup": 0,
       \ "g:quickhl_manual_keywords": [],
       \ "g:quickhl_tag_enable_at_startup": 0,
+      \ "g:quickhl_tag_hl_command": 'QuickhlTag gui=underline cterm=underline term=underline',
       \ "g:quickhl_tag_hl_priority": 9,
       \ "g:quickhl_cword_enable_at_startup": 0,
+      \ "g:quickhl_cword_hl_command": 'link QuickhlCword Search',
       \ }
 
-function! s:set_default(dict)
+function! s:set_default(dict) "{{{
   for [var, val] in items(a:dict)
     if !exists(var) | let {var} = val | endif
     unlet! var val
   endfor
-endfunction
+endfunction "}}}
 
 call s:set_default(s:default_settings)
 

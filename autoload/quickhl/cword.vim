@@ -2,6 +2,15 @@ let s:cword = {
       \ "enable": g:quickhl_cword_enable_at_startup,
       \ }
 
+function! s:cword.init() "{{{
+  call self.init_highlight()
+endfunction "}}}
+
+function! s:cword.init_highlight() "{{{
+  exe "highlight ". escape(g:quickhl_cword_hl_command, '!|')
+  " highlight link QuickhlCword Search
+endfunction "}}}
+
 function! s:cword.set() "{{{
   let pattern = quickhl#escape(expand('<cword>'))
   exe "2match QuickhlCword /". pattern . "/"
@@ -17,11 +26,16 @@ function! s:cword.refresh() "{{{
   call self.set()
 endfunction "}}}
 
+function! quickhl#cword#init_highlight() "{{{
+  call s:cword.init_highlight()
+endfunction "}}}
+
 function! quickhl#cword#enable() "{{{
   let s:cword.enable = 1
   augroup QuickhlCword
     autocmd!
     autocmd! CursorMoved <buffer> call quickhl#cword#refresh()
+    autocmd! ColorScheme * call quickhl#cword#init_highlight()
   augroup END
   call quickhl#cword#refresh()
 endfunction "}}}
@@ -48,4 +62,5 @@ function! quickhl#cword#toggle() "{{{
   endif
 endfunction "}}}
 
+call s:cword.init()
 " vim: foldmethod=marker
