@@ -1,7 +1,6 @@
 let s:tag = {
       \ "name": "QuickhlTag",
       \ "enable":   g:quickhl_tag_enable_at_startup,
-      \ "priority": g:quickhl_tag_hl_priority,
       \ }
 
 function! s:tag.init() "{{{
@@ -14,7 +13,8 @@ function! s:tag.init_highlight() "{{{
 endfunction "}}}
 
 function! s:tag.set() "{{{
-  call map(taglist('.*'), 'matchadd("'. self.name . '", v:val.name, self.priority)')
+  call map(taglist('.*'),
+        \ 'matchadd("'. self.name . '", v:val.name, g:quickhl_tag_hl_priority)')
 endfunction "}}}
 
 function! s:tag.clear() "{{{

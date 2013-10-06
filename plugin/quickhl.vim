@@ -3,7 +3,7 @@
 " Author: t9md <taqumd@gmail.com>
 " WebPage: http://github.com/t9md/vim-quickhl
 " License: BSD
-" Version: 0.5
+" Version: 0.9
 "=============================================================================
 " GUARD: {{{
 if !exists('g:quickhl_debug')
@@ -41,6 +41,7 @@ endif
 let s:default_settings = {
       \ "g:quickhl_manual_enable_at_startup": 0,
       \ "g:quickhl_manual_keywords": [],
+      \ "g:quickhl_manual_hl_priority": 10,
       \ "g:quickhl_tag_enable_at_startup": 0,
       \ "g:quickhl_tag_hl_command": 'QuickhlTag gui=underline cterm=underline term=underline',
       \ "g:quickhl_tag_hl_priority": 9,

@@ -1,16 +1,16 @@
 *quickhl.txt* Quickly highlight multiple pattern.
 						      
 						      
-       .oooooo.                o8o          oooo       oooo       oooo  ~
-      d8P'  `Y8b               `"'          `888       `888       `888  ~
-     888      888  oooo  oooo oooo  .ooooo.  888  oooo  888 .oo.   888  ~
-     888      888  `888  `888 `888 d88' `"Y8 888 .8P'   888P"Y88b  888  
-     888      888   888   888  888 888       888888.    888   888  888  >
-     `88b    d88b   888   888  888 888   .o8 888 `88b.  888   888  888  
+       .oooooo.		       o8o	    oooo       oooo	  oooo	~
+      d8P'  `Y8b	       `"'	    `888       `888	  `888	~
+     888      888  oooo  oooo oooo  .ooooo.  888  oooo	888 .oo.   888	~
+     888      888  `888  `888 `888 d88' `"Y8 888 .8P'	888P"Y88b  888	
+     888      888   888   888  888 888	     888888.	888   888  888	>
+     `88b    d88b   888   888  888 888	 .o8 888 `88b.	888   888  888	
       `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o <
 
 
-Version: 0.5
+Version: 0.9
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
@@ -23,130 +23,151 @@ Variables				    |quickhl-variables|
 Configuration Examples			    |quickhl-examples|
 Use Case				    |quickhl-usecase|
 Practice				    |quickhl-practice|
-Bug     				    |quickhl-bug|
+Bug					    |quickhl-bug|
 Changelog				    |quickhl-changelog|
 
 ==============================================================================
-INTRODUCTION				      	*quickhl-introduction*
+INTRODUCTION					*quickhl-introduction*
 
 
 ==============================================================================
 MAPPINGS					*quickhl-mappings*
 
-n <Plug>(quickhl-toggle)
-v <Plug>(quickhl-toggle)
+n <Plug>(quickhl-manual-toggle)
+	Highlight |<cword>|.
+v <Plug>(quickhl-manual-toggle)
+	Highlight selected text.
 
-	highlight |<cword>| or visually selected text
+n <Plug>(quickhl-manual-reset)
+v <Plug>(quickhl-manual-reset)
+	Clear all manually added highlight
 
+n <Plug>(quickhl-cword-toggle)
+n <Plug>(quickhl-cword-enable)
+n <Plug>(quickhl-cword-disable)
+	Highlight |<cword>| with |:2match|
 
-n <Plug>(quickhl-reset)
-v <Plug>(quickhl-reset)
-
-	clear all quick-highlight
-
-
-n <Plug>(quickhl-match)
-
-	undercurl on |<cword>| with |:match|
+n <Plug>(quickhl-tag-enable)
+n <Plug>(quickhl-tag-disable)
+n <Plug>(quickhl-tag-toggle)
+	Highlight jumpable 'tag'
 
 ==============================================================================
 COMMANDS						*quickhl-commands*
 
-:QuickhlList		Show registerd keyword list with color
-:QuickhlReset		Reset all
-:QuickhlDump		Used for debug. depend on thinca's prettyprint.vim.
-:QuickhlColors		Show colors
-:QuickhlReloadColors	reload color table from |g:quickhl_colors|.
-:QuickhlAdd {pattern}	Add {pattern}
-:QuickhlAdd! {pattern}	Add |regexp| {pattern}.
-			{pattern} is passed to |matchadd()| without escape.
-:QuickhlDel {pattern}	Delete {pattern}.
-			if {pattern} was omitted, ask delete index interactively.
-:QuickhlDel! {pattern}	Delete regexp {pattern}.
-			{pattern} will compared without escape metachar.
-:QuickhlLock		Lock highlight on current buffer.
-:QuickhlUnLock		UnLock highlight on current buffer.
+:QuickhlManualEnable		Enable
+:QuickhlManualDisable		Disable
+:QuickhlManualAdd		{pattern} Add pattern
+:QuickhlManualAdd!		{pattern} Add pattern
+:QuickhlManualDelete		{pattern} Delete {pattern} but
+:QuickhlManualDelete!		{pattern} Delete {pattern} but
+:QuickhlManualReset		Reset all keywords except static ones.
+:QuickhlManualList		Show list of keyword with color.
+:QuickhlManualColors		Show color list.
+:QuickhlManualLock		Disable highlight for current buffer temporarily.
+:QuickhlManualUnlock		Unlock.
 
-:QuickhlMatch		highlight |<cword>| with |:match|
-:QuickhlMatchClear	clear match
-:QuickhlMatchAuto	{auto-match} each |CursorMoved|
-:QuickhlMatchNoAuto	quit {auto-match} mode
+:QuickhlCwordEnable	Enable highlight <crowd> updated on |CursorMoved|.
+:QuickhlCwordDisable 	Disable
+:QuickhlCwordToggle  	Toggle
 
+:QuickhlTagEnable   Enable highlight of jumpable |tag|.
+:QuickhlTagDisable  Disable
+:QuickhlTagToggle   Toggle
 ==============================================================================
 VARIABLES						*quickhl-variables*
 
-g:quickhl_colors
+[ manual ]~
+*g:quickhl_manual_enable_at_startup*
+	Default: 0
+
+*g:quickhl_manual_hl_priority*
+	Default: 10
+
+	These priority value is used when highlight with |matchadd()|.
+	The bigger value overwite lower prioritized highlight.
+
+*g:quickhl_manual_colors*
+	Default: 13 colors defined. see 'plugin/quickhl.vim' for detail.
+
 	|List| of color's definition used to quick-highlight.
 	see |quickhl-examples|.
-	The size of this array is limit the max color quickhl can highlight.
-	So, if you want to cololize 20 keyword at a time, you need 20 size of
-	|g:quickhl_colors| array.
+	You can add as many colors as you want.
+	If you want to highlight 20 keyword at a time, you need to set 20
+	variation of color in this |List|.
 
-							  *g:quickhl_keywords*
-g:quickhl_keywords
+*g:quickhl_manual_keywords*
+	Default: []
+
 	|List| of keyword always highlighted.
-        'keyword' could be specified as sequence of |String| or |Dictionary|.
-        See |quickhl-examples|
+	'keyword' could be specified as sequence of |String| or |Dictionary|.
+	String~
+	"keyword1"
+	Dictionary~
+	{ "pattern": 'KEYWORD', "regexp": 1 }
+	"regexp" is optional, if you set it to 1, the KEYWORD you sepcified
+	will not escaped, so it's useful you want to add 'regexp' keyword.
+
+[ tag ]~
+*g:quickhl_tag_enable_at_startup*
+	Default: 0
+
+*g:quickhl_tag_hl_priority*
+	Default: 9
+	See |g:quickhl_manual_hl_priority|.
+
+*g:quickhl_tag_hl_command*
+	Default: 'QuickhlTag gui=underline cterm=underline term=underline'
+
+	Passed to |:highlight|. Set this if you want change default highlight.
+	
+[ cword ]~
+*g:quickhl_cword_enable_at_startup*
+	Default: 0
+
+*g:quickhl_cword_hl_command*
+	Default: 'link QuickhlCword Search'
+
+	Passed to |:highlight|. Set this if you want change default highlight.
 
 ==============================================================================
-CONFIGURATION EXAMPLE                               *quickhl-examples*
+CONFIGURATION EXAMPLE				    *quickhl-examples*
 
+set in your '.vimrc'
 >
-    nmap <Space>m <Plug>(quickhl-toggle)
-    xmap <Space>m <Plug>(quickhl-toggle)
-    nmap <Space>M <Plug>(quickhl-reset)
-    xmap <Space>M <Plug>(quickhl-reset)
+    nmap <Space>m <Plug>(quickhl-manual-toggle)
+    xmap <Space>m <Plug>(quickhl-manual-toggle)
 
-    nmap <Space>j <Plug>(quickhl-match)
+    nmap <Space>M <Plug>(quickhl-manual-reset)
+    xmap <Space>M <Plug>(quickhl-manual-reset)
+
+    nmap <Space>j <Plug>(quickhl-cword-toggle)
+
+    nmap <Space>] <Plug>(quickhl-tag-toggle)
 <
 
-If you want to change default color, set 'g:quickhl_colors' array like following
-in your '.vimrc'.
-
+Want to change default color?
 >
-    let g:quickhl_colors = [
-          \ "gui=bold ctermfg=255 ctermbg=153 guifg=#ffffff guibg=#0a7383",
-          \ "gui=bold guibg=#a07040 guifg=#ffffff",
-          \ "gui=bold guibg=#4070a0 guifg=#ffffff",
-          \ ]
-
+  let g:quickhl_manual_colors = [
+        \ "gui=bold ctermfg=16  ctermbg=153 guifg=#ffffff guibg=#0a7383",
+        \ "gui=bold ctermfg=7   ctermbg=1   guibg=#a07040 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=2   guibg=#4070a0 guifg=#ffffff",
+        \ "gui=bold ctermfg=7   ctermbg=3   guibg=#40a070 guifg=#ffffff",
+        \ ]
 <
 
-|g:quickhl_keywords| could be specified either sequence of 'string' or 'dictionary'
-See following example.
-
-To highlight some static keyword always(sequence of string),
+Add keyword which is always highlighted.
 >
-    let g:quickhl_keywords = [
-          \ "WORD1",
-          \ "WORD2",
-          \ ]
-<
-
-To highlight some keyword always(sequence of dictionary),
->
-    let g:quickhl_keywords = [
-          \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
-          \ {"pattern": 'NOTE'},
-          \ {"pattern": 'MEMO'},
-          \ ]
-
-    let g:quickhl_manual_keywords = [
-          \ "finish",
-          \ {"pattern": '\s\+$', "regexp": 1 },
-          \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
-          \ ]
-<
-To highlight some keyword always(combined),
->
-    let g:quickhl_keywords = [
-          \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
-          \ "NOTE",
-          \ "MEMO",
-          \ ]
+  let g:quickhl_manual_keywords._ = [
+        \ "finish",
+        \ {"pattern": '\s\+$', "regexp": 1 },
+        \ {"pattern": '\d\{1,3}\.\d\{1,3}\.\d\{1,3}\.\d\{1,3}', "regexp": 1 },
+        \ ]
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
+2013-10-06: v0.9
+	- introduce tag highlight and a lot of refactoring.
 2011-09-03:
 	- bugfix duplicate keyword added when TabEnter or ColorScheme event.
 2011-09-01: v0.5
