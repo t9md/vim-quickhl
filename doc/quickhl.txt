@@ -31,28 +31,34 @@ INTRODUCTION					*quickhl-introduction*
 ==============================================================================
 MAPPINGS					*quickhl-mappings*
 
-n <Plug>(quickhl-manual-this)
-	Highlight |<cword>|.
-v <Plug>(quickhl-manual-this)
-	Highlight selected text.
+n   <Plug>(quickhl-manual-this)
+	  Highlight |<cword>|.
+v   <Plug>(quickhl-manual-this)
+	  Highlight selected text.
 
-n <Plug>(quickhl-manual-reset)
-v <Plug>(quickhl-manual-reset)
-	Clear all manually added highlight
+n   <Plug>(quickhl-manual-reset)
+v   <Plug>(quickhl-manual-reset)
+	  Clear all manually added highlight
 
-n <Plug>(quickhl-manual-toggle)
-v <Plug>(quickhl-manual-toggle)
-	Toggle global lock
+n   <Plug>(quickhl-manual-toggle)
+v   <Plug>(quickhl-manual-toggle)
+	  Toggle global lock
 
-n <Plug>(quickhl-cword-toggle)
-n <Plug>(quickhl-cword-enable)
-n <Plug>(quickhl-cword-disable)
-	Highlight |<cword>| with |:2match|
+n   <Plug>(quickhl-cword-toggle)
+n   <Plug>(quickhl-cword-enable)
+n   <Plug>(quickhl-cword-disable)
+	  Highlight |<cword>| with |:2match|
 
-n <Plug>(quickhl-tag-enable)
-n <Plug>(quickhl-tag-disable)
-n <Plug>(quickhl-tag-toggle)
-	Highlight jumpable 'tag'
+n   <Plug>(quickhl-tag-enable)
+n   <Plug>(quickhl-tag-disable)
+n   <Plug>(quickhl-tag-toggle)
+	  Highlight jumpable 'tag'
+
+oxn <Plug>(operator-quickhl-manual-this-motion)
+	  Highlight area you {motion}ed.
+          To use this feature, you must install 'vim-operator-user' plugin.
+	  https://github.com/kana/vim-operator-user
+          And if you use this, you may not need <Plug>(quickhl-manual-this).
 
 ==============================================================================
 COMMANDS						*quickhl-commands*
@@ -154,6 +160,8 @@ set in your '.vimrc'
     nmap <Space>j <Plug>(quickhl-cword-toggle)
 
     nmap <Space>] <Plug>(quickhl-tag-toggle)
+
+    map H <Plug>(operator-quickhl-manual-this-motion)
 <
 
 Want to change default color?
@@ -176,6 +184,10 @@ Add keyword which is always highlighted.
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
+2013-10-06:
+	- add operator
+	  Originally created by 'rbtnn'. Thanks 'rbtnn'!!
+	  https://github.com/rbtnn/vim-operator-quickhl.vim
 2013-10-06: v0.9
 	- introduce tag highlight and a lot of refactoring.
 2011-09-03:

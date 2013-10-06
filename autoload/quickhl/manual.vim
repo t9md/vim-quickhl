@@ -172,12 +172,15 @@ function! quickhl#manual#this(mode) "{{{
         \ ""
   if pattern == '' | return | endif
   " call s:decho("[toggle] " . pattern)
-  if s:manual.index_of(quickhl#escape(pattern)) == -1
-    " call s:decho("[toggle add]:" . pattern)
-    call s:manual.add(pattern, 0)
+  call quickhl#manual#add_or_del(pattern)
+endfunction "}}}
+
+function! quickhl#manual#add_or_del(pattern) "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  if s:manual.index_of(quickhl#escape(a:pattern)) == -1
+    call s:manual.add(a:pattern, 0)
   else
-    " call s:decho("[toggle del]:" . pattern)
-    call s:manual.del(pattern, 0)
+    call s:manual.del(a:pattern, 0)
   endif
   call quickhl#manual#refresh()
 endfunction "}}}
@@ -276,6 +279,16 @@ endfunction "}}}
 function! quickhl#manual#init_highlight() "{{{
   call s:manual.init_highlight()
 endfunction "}}}
+
+function! quickhl#manual#this_motion(motion_wise) " {{{
+  for n in range(line("'["), line("']"))
+    call quickhl#manual#add_or_del(
+          \ ( a:motion_wise ==# 'block' || a:motion_wise ==# 'char' )
+          \ ? getline(n)[col("'[")-1 : col("']")-1]
+          \ : getline(n)
+          \ )
+  endfor
+endfunction " }}}
 
 call s:manual.init()
 " vim: foldmethod=marker
