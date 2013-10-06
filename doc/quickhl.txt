@@ -1,15 +1,13 @@
 *quickhl.txt* Quickly highlight multiple pattern.
 						      
-						      
        .oooooo.		       o8o	    oooo       oooo	  oooo	~
       d8P'  `Y8b	       `"'	    `888       `888	  `888	~
      888      888  oooo  oooo oooo  .ooooo.  888  oooo	888 .oo.   888	~
      888      888  `888  `888 `888 d88' `"Y8 888 .8P'	888P"Y88b  888	
-     888      888   888   888  888 888	     888888.	888   888  888	>
+     888      888   888   888  888 888	     888888.	888   888  888	 >
      `88b    d88b   888   888  888 888	 .o8 888 `88b.	888   888  888	
-      `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o <
-
-
+      `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o
+<
 Version: 0.9
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-quickhl
@@ -33,14 +31,18 @@ INTRODUCTION					*quickhl-introduction*
 ==============================================================================
 MAPPINGS					*quickhl-mappings*
 
-n <Plug>(quickhl-manual-toggle)
+n <Plug>(quickhl-manual-this)
 	Highlight |<cword>|.
-v <Plug>(quickhl-manual-toggle)
+v <Plug>(quickhl-manual-this)
 	Highlight selected text.
 
 n <Plug>(quickhl-manual-reset)
 v <Plug>(quickhl-manual-reset)
 	Clear all manually added highlight
+
+n <Plug>(quickhl-manual-toggle)
+v <Plug>(quickhl-manual-toggle)
+	Toggle global lock
 
 n <Plug>(quickhl-cword-toggle)
 n <Plug>(quickhl-cword-enable)
@@ -57,15 +59,19 @@ COMMANDS						*quickhl-commands*
 
 :QuickhlManualEnable		Enable
 :QuickhlManualDisable		Disable
-:QuickhlManualAdd		{pattern} Add pattern
-:QuickhlManualAdd!		{pattern} Add pattern
-:QuickhlManualDelete		{pattern} Delete {pattern} but
-:QuickhlManualDelete!		{pattern} Delete {pattern} but
+:QuickhlManualAdd {pattern}	Add {pattern} with escaped.
+:QuickhlManualAdd! {pattern}	Add {pattern} as-is.
+:QuickhlManualDelete {pattern}	Delete {pattern} with escaped.
+:QuickhlManualDelete! {pattern}	Delete {pattern} as-is.
 :QuickhlManualReset		Reset all keywords except static ones.
 :QuickhlManualList		Show list of keyword with color.
 :QuickhlManualColors		Show color list.
-:QuickhlManualLock		Disable highlight for current buffer temporarily.
+:QuickhlManualLock		Disable highlight temporarily.
 :QuickhlManualUnlock		Unlock.
+:QuickhlManualLockToggle	Toggle global lock
+:QuickhlManualLockWindow	Lock version of current window.
+:QuickhlManualUnlockWindow	Unlock current window.
+:QuickhlManualLockWindowToggle	Toggle window lock.
 
 :QuickhlCwordEnable	Enable highlight <crowd> updated on |CursorMoved|.
 :QuickhlCwordDisable 	Disable
@@ -118,6 +124,7 @@ VARIABLES						*quickhl-variables*
 
 *g:quickhl_tag_hl_command*
 	Default: 'QuickhlTag gui=underline cterm=underline term=underline'
+	[NOTE] Don't change 'QuickhlTag'
 
 	Passed to |:highlight|. Set this if you want change default highlight.
 	
@@ -127,6 +134,7 @@ VARIABLES						*quickhl-variables*
 
 *g:quickhl_cword_hl_command*
 	Default: 'link QuickhlCword Search'
+	[NOTE] Don't change 'QuickhlCword'
 
 	Passed to |:highlight|. Set this if you want change default highlight.
 
@@ -135,8 +143,10 @@ CONFIGURATION EXAMPLE				    *quickhl-examples*
 
 set in your '.vimrc'
 >
-    nmap <Space>m <Plug>(quickhl-manual-toggle)
-    xmap <Space>m <Plug>(quickhl-manual-toggle)
+    nmap <Space>m <Plug>(quickhl-manual-this)
+    xmap <Space>m <Plug>(quickhl-manual-this)
+    nmap <F9>     <Plug>(quickhl-manual-toggle)
+    xmap <F9>     <Plug>(quickhl-manual-toggle)
 
     nmap <Space>M <Plug>(quickhl-manual-reset)
     xmap <Space>M <Plug>(quickhl-manual-reset)

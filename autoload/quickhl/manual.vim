@@ -13,6 +13,7 @@ endfunction "}}}
 let s:manual = {
       \ "name": 'QuickhlManual\d',
       \ "enabled": g:quickhl_manual_enable_at_startup,
+      \ "locked": 0,
       \ }
 
 function! s:manual.dump() "{{{
@@ -61,7 +62,9 @@ endfunction "}}}
 
 function! s:manual.set() "{{{
   " call map(copy(self.colors), 'matchadd(v:val.name, v:val.pattern)')
-  for color in self.colors | call matchadd(color.name, color.pattern) | endfor
+  for color in self.colors
+    call matchadd(color.name, color.pattern, g:quickhl_manual_hl_priority)
+  endfor
 endfunction "}}}
 
 function! s:manual.clear() "{{{
@@ -74,9 +77,15 @@ function! s:manual.reset() "{{{
   if self.enabled | call self.inject_keywords() | endif
 endfunction "}}}
 
+function! s:manual.is_locked()
+  return self.locked
+endfunction
+
 function! s:manual.refresh() "{{{
   call self.clear()
-  if exists("b:quickhl_manual_lock") | return | endif
+  if self.locked || ( exists("w:quickhl_manual_lock") && w:quickhl_manual_lock )
+    return
+  endif
   call self.set()
 endfunction "}}}
 
@@ -155,7 +164,7 @@ function! s:manual.setup_autocmd() "{{{
   augroup END
 endfunction "}}}
 
-function! quickhl#manual#toggle(mode) "{{{
+function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern = 
         \ a:mode == 'n' ? expand('<cword>') :
@@ -182,13 +191,36 @@ function! quickhl#manual#list() "{{{
   call s:manual.list()
 endfunction "}}}
 
-function! quickhl#manual#lock() "{{{
-  let b:quickhl_manual_lock = 1
+function! quickhl#manual#lock_window() "{{{
+  let w:quickhl_manual_lock = 1
   call s:manual.clear()
 endfunction "}}}
 
+function! quickhl#manual#unlock_window() "{{{
+  let w:quickhl_manual_lock = 0
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#lock_window_toggle() "{{{
+  if !exists("w:quickhl_manual_lock")
+    let w:quickhl_manual_lock = 0
+  endif
+  let w:quickhl_manual_lock = !w:quickhl_manual_lock
+  call s:manual.refresh()
+endfunction "}}}
+
+function! quickhl#manual#lock() "{{{
+  let s:manual.locked = 1
+  call quickhl#manual#refresh()
+endfunction "}}}
+
 function! quickhl#manual#unlock() "{{{
-  unlet! b:quickhl_manual_lock
+  let s:manual.locked = 0
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#lock_toggle() "{{{
+  let s:manual.locked = !s:manual.locked
   call quickhl#manual#refresh()
 endfunction "}}}
 

@@ -61,34 +61,41 @@ call s:set_default(s:default_settings)
 "}}}
 
 " Keymap: {{{
-nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#toggle('n')<CR>
-vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#toggle('v')<CR>
+nnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('n')<CR>
+vnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
-
-command!                QuickhlManualEnable       :call quickhl#manual#enable()
-command!                QuickhlManualDisable       :call quickhl#manual#disable()
-
-command!                QuickhlManualList       :call quickhl#manual#list()
-"command!                QuickhlManualDump       :call quickhl#manual#dump()
-command!                QuickhlManualReset      :call quickhl#manual#reset()
-command!                QuickhlManualColors     :call quickhl#manual#colors()
-command! -bang -nargs=1 QuickhlManualAdd        :call quickhl#manual#add(<q-args>,<bang>0)
-command! -bang -nargs=* QuickhlManualDelete     :call quickhl#manual#del(<q-args>,<bang>0)
-command!                QuickhlManualLock    :call quickhl#manual#lock()
-command!                QuickhlManualUnlock  :call quickhl#manual#unlock()
+nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
+vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
 
 nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword#enable()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-disable) :call quickhl#cword#disable()<CR>
 
-command! QuickhlCwordEnable  :call quickhl#cword#enable()
-command! QuickhlCwordDisable :call quickhl#cword#disable()
-command! QuickhlCwordToggle  :call quickhl#cword#toggle()
-
 nnoremap <silent> <Plug>(quickhl-tag-enable)     :call quickhl#tag#enable()<CR>
 nnoremap <silent> <Plug>(quickhl-tag-disable)    :call quickhl#tag#disable()<CR>
 nnoremap <silent> <Plug>(quickhl-tag-toggle)     :call quickhl#tag#toggle()<CR>
+
+command!                QuickhlManualEnable       :call quickhl#manual#enable()
+command!                QuickhlManualDisable       :call quickhl#manual#disable()
+
+command!                QuickhlManualList    :call quickhl#manual#list()
+"command!                QuickhlManualDump    :call quickhl#manual#dump()
+command!                QuickhlManualReset   :call quickhl#manual#reset()
+command!                QuickhlManualColors  :call quickhl#manual#colors()
+command! -bang -nargs=1 QuickhlManualAdd     :call quickhl#manual#add(<q-args>,<bang>0)
+command! -bang -nargs=* QuickhlManualDelete  :call quickhl#manual#del(<q-args>,<bang>0)
+command!                QuickhlManualLock    :call quickhl#manual#lock()
+
+command! QuickhlManualUnlock            :call quickhl#manual#unlock()
+command! QuickhlManualLockToggle        :call quickhl#manual#lock_toggle()
+command! QuickhlManualLockWindow        :call quickhl#manual#lock_window()
+command! QuickhlManualUnlockWindow      :call quickhl#manual#unlock_window()
+command! QuickhlManualLockWindowToggle  :call quickhl#manual#lock_window_toggle()
+
+command! QuickhlCwordEnable  :call quickhl#cword#enable()
+command! QuickhlCwordDisable :call quickhl#cword#disable()
+command! QuickhlCwordToggle  :call quickhl#cword#toggle()
 
 command! QuickhlTagEnable   :call quickhl#tag#enable()
 command! QuickhlTagDisable  :call quickhl#tag#disable()
