@@ -77,9 +77,9 @@ function! s:manual.reset() "{{{
   if self.enabled | call self.inject_keywords() | endif
 endfunction "}}}
 
-function! s:manual.is_locked()
+function! s:manual.is_locked() "{{{
   return self.locked
-endfunction
+endfunction "}}}
 
 function! s:manual.refresh() "{{{
   call self.clear()
@@ -281,13 +281,29 @@ function! quickhl#manual#init_highlight() "{{{
 endfunction "}}}
 
 function! quickhl#manual#this_motion(motion_wise) " {{{
-  for n in range(line("'["), line("']"))
-    call quickhl#manual#add_or_del(
-          \ ( a:motion_wise ==# 'block' || a:motion_wise ==# 'char' )
-          \ ? getline(n)[col("'[")-1 : col("']")-1]
-          \ : getline(n)
-          \ )
-  endfor
+  let lnum_beg = line("'[")
+  let lnum_end = line("']")
+  for n in range(lnum_beg, lnum_end)
+    let _s = getline(n)
+    let s = { 
+          \  "all":     _s,
+          \  "between": _s[col("'[")-1 : col("']")-1],
+          \  "pos2end": _s[col("'[")-1 : -1 ],
+          \  "beg2pos": _s[ : col("']")-1],
+          \  }
+
+    if a:motion_wise == 'char'
+      let str =
+            \ lnum_beg == lnum_end ?            s.between : 
+            \ n        == lnum_beg ?            s.pos2end :
+            \ n        == lnum_end ?            s.beg2pos :
+            \                                   s.all
+    elseif a:motion_wise == 'line'  | let str = s.all
+    elseif a:motion_wise == 'block' | let str = s.between
+    endif
+
+    call quickhl#manual#add_or_del(str)
+  endfor "}}}
 endfunction " }}}
 
 call s:manual.init()
