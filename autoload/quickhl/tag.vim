@@ -26,9 +26,8 @@ endfunction "}}}
 
 function! s:tag.refresh() "{{{
   " only enable on normal(&buftype is empty) buffer.
-  if !empty(&buftype) | return | endif
-
   call self.clear()
+  if !empty(&buftype) | return | endif
   if !self.enable | return | endif
   call self.set()
 endfunction "}}}
