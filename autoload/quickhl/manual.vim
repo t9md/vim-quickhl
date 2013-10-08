@@ -303,7 +303,7 @@ function! quickhl#manual#this_motion(motion_wise) " {{{
     endif
 
     call quickhl#manual#add_or_del(str)
-  endfor "}}}
+  endfor
 endfunction " }}}
 
 call s:manual.init()

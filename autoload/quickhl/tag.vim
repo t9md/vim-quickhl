@@ -13,8 +13,11 @@ function! s:tag.init_highlight() "{{{
 endfunction "}}}
 
 function! s:tag.set() "{{{
-  call map(taglist('.*'),
-        \ 'matchadd("'. self.name . '", v:val.name, g:quickhl_tag_hl_priority)')
+  let taglist = taglist('.*')
+  call filter(taglist, 'len(v:val.name) >= g:quickhl_tag_minimum_identifier')
+  for tag in taglist
+     call matchadd(self.name, tag.name, g:quickhl_tag_hl_priority)
+  endfor
 endfunction "}}}
 
 function! s:tag.clear() "{{{

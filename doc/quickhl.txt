@@ -133,6 +133,11 @@ VARIABLES						*quickhl-variables*
 	[NOTE] Don't change 'QuickhlTag'
 
 	Passed to |:highlight|. Set this if you want change default highlight.
+
+*g:quickhl_tag_minimum_identifier*
+	Default: 4
+	specify minimum length of tag to highlight.
+	tag shorter than this value would not be highlighted.
 	
 [ cword ]~
 *g:quickhl_cword_enable_at_startup*
@@ -184,6 +189,9 @@ Add keyword which is always highlighted.
 <
 ==============================================================================
 CHANGELOG						*quickhl-changelog*
+2013-10-08:
+	- add g:quickhl_tag_minimum_identifier(default: 4) to avoid short tag
+	  make mess on the window.
 2013-10-06:
 	- add operator
 	  Originally created by 'rbtnn'. Thanks 'rbtnn'!!
