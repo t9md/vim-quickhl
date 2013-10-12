@@ -37,6 +37,7 @@ function! quickhl#cword#enable() "{{{
     autocmd! CursorMoved <buffer> call quickhl#cword#refresh()
     autocmd! ColorScheme * call quickhl#cword#init_highlight()
   augroup END
+  call quickhl#cword#init_highlight()
   call quickhl#cword#refresh()
 endfunction "}}}
 

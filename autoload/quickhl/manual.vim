@@ -150,20 +150,6 @@ function! s:manual.list() "{{{
   endfor
 endfunction "}}}
 
-function! s:manual.setup_autocmd() "{{{
-  augroup QuickhlManual
-    autocmd!
-    if s:manual.enabled
-      autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
-      autocmd TabEnter *
-            \   if exists(':Tcolorscheme')
-            \ |   call quickhl#manual#init_highlight()
-            \ | endif
-      autocmd! ColorScheme * call quickhl#manual#init_highlight()
-    endif
-  augroup END
-endfunction "}}}
-
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern = 
@@ -258,13 +244,22 @@ function! quickhl#manual#enable() "{{{
   call s:manual.init()
   let  s:manual.enabled = 1
   call s:manual.inject_keywords()
-  call s:manual.setup_autocmd()
+
+  augroup QuickhlManual
+    autocmd!
+    autocmd VimEnter,WinEnter * call quickhl#manual#refresh()
+    autocmd! ColorScheme * call quickhl#manual#init_highlight()
+  augroup END
+  call quickhl#manual#init_highlight()
   call quickhl#manual#refresh()
 endfunction "}}}
 
 function! quickhl#manual#disable() "{{{
   let s:manual.enabled = 0
-  call s:manual.setup_autocmd()
+  augroup QuickhlManual
+    autocmd!
+  augroup END
+  aucmd! QuickhlManual
   call quickhl#manual#reset()
 endfunction "}}}
 

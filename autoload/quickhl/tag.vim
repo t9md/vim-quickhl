@@ -43,6 +43,7 @@ function! quickhl#tag#enable() "{{{
     autocmd! BufEnter,WinEnter * call quickhl#tag#refresh()
     autocmd! ColorScheme * call quickhl#tag#init_highlight()
   augroup END
+  call quickhl#tag#init_highlight()
   call quickhl#tag#refresh()
 endfunction "}}}
 
@@ -51,7 +52,7 @@ function! quickhl#tag#disable() "{{{
   augroup QuickhlTag
     autocmd!
   augroup END
-  augroup! QuickhlTag
+  autocmd! QuickhlTag
   call quickhl#tag#refresh()
 endfunction "}}}
 
