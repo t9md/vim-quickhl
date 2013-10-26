@@ -3,7 +3,7 @@
 " Author: t9md <taqumd@gmail.com>
 " WebPage: http://github.com/t9md/vim-quickhl
 " License: BSD
-" Version: 0.9
+" Version: 1.0
 "=============================================================================
 " GUARD: {{{
 if !exists('g:quickhl_debug')

@@ -8,7 +8,7 @@
      `88b    d88b   888   888  888 888	 .o8 888 `88b.	888   888  888	
       `Y8bood8P'Ybd'`V88V"V8P'o888o`Y8bod8P'o888o o888oo888o o888oo888o
 <
-Version: 0.9
+Version: 1.0
 Author : t9md <taqumd@gmail.com>
 GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
