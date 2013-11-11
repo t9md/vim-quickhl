@@ -1,4 +1,4 @@
-# Hilight on the fly.
+# Highlight on the fly.
 quickhl.vim support highlight for
 * manual keywords
 * `tag` in ctags generated file
