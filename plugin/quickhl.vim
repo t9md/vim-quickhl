@@ -105,7 +105,7 @@ command! QuickhlTagToggle   :call quickhl#tag#toggle()
 
 try
   call operator#user#define('quickhl-manual-this-motion', 'quickhl#manual#this_motion')
-catch /E117: Unknown function:/
+catch /E117:/
 endtry
 
 if g:quickhl_cword_enable_at_startup
