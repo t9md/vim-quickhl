@@ -27,4 +27,5 @@ map H <Plug>(operator-quickhl-manual-this-motion)
   
 # Movie
 ![Movie](http://gifzo.net/xGOtmydHwZ.gif)
+![Screen shot](http://gifzo.net/LRNAnxYhCq.gif)
 * [help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
