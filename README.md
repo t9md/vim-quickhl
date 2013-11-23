@@ -29,7 +29,7 @@ map H <Plug>(operator-quickhl-manual-this-motion)
 ![Example](https://github.com/t9md/t9md/blob/master/img/vim-quickhl_anime.gif?raw=true)
 
 
-![Movie](http://gifzo.net/xGOtmydHwZ.gif)
+![Movie](http://gifzo.net/xGOtmydHwZ.gif?raw=true)
 
 
 * [help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
