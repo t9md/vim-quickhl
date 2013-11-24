@@ -26,10 +26,6 @@ map H <Plug>(operator-quickhl-manual-this-motion)
 ```
   
 # Movie
-![Example](https://github.com/t9md/t9md/blob/master/img/vim-quickhl_anime.gif?raw=true)
-
-
-![Movie](http://gifzo.net/xGOtmydHwZ.gif)
-
+![Movie](http://gifzo.net/BAuMnCVZKy7.gif)
 
 * [help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
