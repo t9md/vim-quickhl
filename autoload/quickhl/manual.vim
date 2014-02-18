@@ -1,13 +1,18 @@
-function! s:decho(msg) "{{{
+function! s:decho(msg) "{{{1
   if g:quickhl_debug
     echo "[debug] ". a:msg
   endif
-endfunction "}}}
+endfunction
 
-function! s:exe(cmd) "{{{
+function! s:is_cmdwin() "{{{1
+  return bufname('%') ==# '[Command Line]'
+endfunction
+
+function! s:exe(cmd) "{{{1
   call s:decho("[cmd] " . a:cmd)
   exe a:cmd
-endfunction "}}}
+endfunction
+"}}}
 
 
 let s:manual = {
@@ -259,7 +264,7 @@ function! quickhl#manual#disable() "{{{
   augroup QuickhlManual
     autocmd!
   augroup END
-  aucmd! QuickhlManual
+  autocmd! QuickhlManual
   call quickhl#manual#reset()
 endfunction "}}}
 
