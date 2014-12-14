@@ -63,29 +63,29 @@ oxn <Plug>(operator-quickhl-manual-this-motion)
 ==============================================================================
 COMMANDS						*quickhl-commands*
 
-:QuickhlManualEnable		Enable
-:QuickhlManualDisable		Disable
-:QuickhlManualAdd {pattern}	Add {pattern} with escaped.
-:QuickhlManualAdd! {pattern}	Add {pattern} as-is.
-:QuickhlManualDelete {pattern}	Delete {pattern} with escaped.
-:QuickhlManualDelete! {pattern}	Delete {pattern} as-is.
-:QuickhlManualReset		Reset all keywords except static ones.
-:QuickhlManualList		Show list of keyword with color.
-:QuickhlManualColors		Show color list.
-:QuickhlManualLock		Disable highlight temporarily.
-:QuickhlManualUnlock		Unlock.
-:QuickhlManualLockToggle	Toggle global lock
-:QuickhlManualLockWindow	Lock version of current window.
-:QuickhlManualUnlockWindow	Unlock current window.
-:QuickhlManualLockWindowToggle	Toggle window lock.
+*:QuickhlManualEnable*		Enable.
+*:QuickhlManualDisable*		Disable.
+*:QuickhlManualAdd* {pattern}	Add {pattern} with escaped.
+*:QuickhlManualAdd!* {pattern}	Add {pattern} as-is.
+*:QuickhlManualDelete* {pattern}  Delete {pattern} with escaped.
+*:QuickhlManualDelete!* {pattern} Delete {pattern} as-is.
+*:QuickhlManualReset*		Reset all keywords except static ones.
+*:QuickhlManualList*		Show list of keyword with color.
+*:QuickhlManualColors*		Show color list.
+*:QuickhlManualLock*		Disable highlight temporarily.
+*:QuickhlManualUnlock*		Unlock.
+*:QuickhlManualLockToggle*	Toggle global lock.
+*:QuickhlManualLockWindow*	Lock version of current window.
+*:QuickhlManualUnlockWindow*	Unlock current window.
+*:QuickhlManualLockWindowToggle*  Toggle window lock.
 
-:QuickhlCwordEnable	Enable highlighting <cword> (updated on |CursorMoved|).
-:QuickhlCwordDisable	Disable
-:QuickhlCwordToggle	Toggle
+*:QuickhlCwordEnable*	Enable highlighting <cword> (updated on |CursorMoved|).
+*:QuickhlCwordDisable*	Disable.
+*:QuickhlCwordToggle*	Toggle.
 
-:QuickhlTagEnable   Enable highlight of jumpable |tag|.
-:QuickhlTagDisable  Disable
-:QuickhlTagToggle   Toggle
+*:QuickhlTagEnable*   Enable highlighting of jumpable |tag|s.
+*:QuickhlTagDisable*  Disable.
+*:QuickhlTagToggle*   Toggle.
 ==============================================================================
 VARIABLES						*quickhl-variables*
 
