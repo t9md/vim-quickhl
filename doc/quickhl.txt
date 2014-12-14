@@ -79,9 +79,9 @@ COMMANDS						*quickhl-commands*
 :QuickhlManualUnlockWindow	Unlock current window.
 :QuickhlManualLockWindowToggle	Toggle window lock.
 
-:QuickhlCwordEnable	Enable highlight <crowd> updated on |CursorMoved|.
-:QuickhlCwordDisable 	Disable
-:QuickhlCwordToggle  	Toggle
+:QuickhlCwordEnable	Enable highlighting <cword> (updated on |CursorMoved|).
+:QuickhlCwordDisable	Disable
+:QuickhlCwordToggle	Toggle
 
 :QuickhlTagEnable   Enable highlight of jumpable |tag|.
 :QuickhlTagDisable  Disable
