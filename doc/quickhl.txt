@@ -65,8 +65,8 @@ COMMANDS						*quickhl-commands*
 
 *:QuickhlManualEnable*		Enable.
 *:QuickhlManualDisable*		Disable.
-*:QuickhlManualAdd* {pattern}	Add {pattern} with escaped.
-*:QuickhlManualAdd!* {pattern}	Add {pattern} as-is.
+*:QuickhlManualAdd* {pattern}	Add {pattern} with meta string escaped.
+*:QuickhlManualAdd!* {pattern}	Add {pattern} as-is, means you can use |regexp|.
 *:QuickhlManualDelete* {pattern}  Delete {pattern} with escaped.
 *:QuickhlManualDelete!* {pattern} Delete {pattern} as-is.
 *:QuickhlManualReset*		Reset all keywords except static ones.
