@@ -32,7 +32,10 @@ function! quickhl#windo(func, obj) "{{{
   " echo PP(a:func)
   " echo PP(a:obj)
   noautocmd windo call call(a:func, [], a:obj)
-  execute pwinnum . "wincmd w"
+
+  if pwinnum !=# 0
+    execute pwinnum . "wincmd w"
+  endif
   execute winnum . "wincmd w"
 endfunction "}}}
 
