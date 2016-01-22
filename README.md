@@ -1,3 +1,7 @@
+![](https://github.com/t9md/t9md/raw/dc52eaf0f8cb0984697f42c50be09174117b2ddb/img/quickhl_anime.gif)
+
+[help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
+
 # Highlight on the fly.
 quickhl.vim support highlight for
 * manual keywords
@@ -25,7 +29,3 @@ nmap <Space>] <Plug>(quickhl-tag-toggle)
 map H <Plug>(operator-quickhl-manual-this-motion)
 ```
   
-# Movie
-![Movie](http://gifzo.net/BAuMnCVZKy7.gif)
-
-* [help](https://github.com/t9md/vim-quickhl/blob/master/doc/quickhl.txt)
