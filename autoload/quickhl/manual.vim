@@ -157,21 +157,32 @@ endfunction "}}}
 
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let wholeword = expand('<cword>')
   let pattern =
         \ a:mode == 'n' ? expand('<cword>') :
+        \ a:mode == 'l' ? expand('<cWORD>') :
+        \ a:mode == 'w' ? '\<'.wholeword.'\>' :
         \ a:mode == 'v' ? quickhl#get_selected_text() :
         \ ""
   if pattern == '' | return | endif
   " call s:decho("[toggle] " . pattern)
-  call quickhl#manual#add_or_del(pattern)
+  call quickhl#manual#add_or_del(pattern, a:mode)
 endfunction "}}}
 
-function! quickhl#manual#add_or_del(pattern) "{{{
+function! quickhl#manual#add_or_del(pattern, mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
-  if s:manual.index_of(quickhl#escape(a:pattern)) == -1
-    call s:manual.add(a:pattern, 0)
-  else
-    call s:manual.del(a:pattern, 0)
+  if a:mode == 'n' || a:mode == 'l' || a:mode == 'v'
+      if s:manual.index_of(quickhl#escape(a:pattern)) == -1
+          call s:manual.add(a:pattern, 0)
+      else
+          call s:manual.del(a:pattern, 0)
+      endif
+  elseif a:mode == 'w'
+      if s:manual.index_of(a:pattern) == -1
+          call s:manual.add(a:pattern, 1)
+      else
+          call s:manual.del(a:pattern, 1)
+      endif
   endif
   call quickhl#manual#refresh()
 endfunction "}}}
