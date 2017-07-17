@@ -155,34 +155,88 @@ function! s:manual.list() "{{{
   endfor
 endfunction "}}}
 
+function! quickhl#manual#this_whole_word() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let whole_word = expand('<cword>')
+  if whole_word == '' | return | endif
+  let pattern = '\<'.whole_word.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#this_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let bigword = expand('<cWORD>')
+  if bigword == '' | return | endif
+  let pattern = bigword
+  if s:manual.index_of(quickhl#escape(pattern)) == -1
+      call s:manual.add(pattern, 0)
+  else
+      call s:manual.del(pattern, 0)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#this_whole_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let bigword = expand('<cWORD>')
+  let escaped_bigword = quickhl#escape(bigword)
+  if escaped_bigword == '' | return | endif
+  let pattern = '\<'.escaped_bigword.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#this_whole_classish_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let word = expand('<cword>')
+  if word == '' | return | endif
+  let bigword = expand('<cWORD>')
+  let matched = matchstr(bigword, '\(\w\+\([.$]\)\?\)*'.word.'\([.$]\w\+\)*')
+  let escaped_classish_word = quickhl#escape(matched)
+  let pattern = '\<'.escaped_classish_word.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
+function! quickhl#manual#this_classish_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let word = expand('<cword>')
+  if word == '' | return | endif
+  let bigword = expand('<cWORD>')
+  let pattern = matchstr(bigword, '\(\w\+\([.$]\)\?\)*'.word.'\([.$]\w\+\)*')
+  call quickhl#manual#add_or_del(pattern)
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
-  let wholeword = expand('<cword>')
   let pattern =
         \ a:mode == 'n' ? expand('<cword>') :
-        \ a:mode == 'l' ? expand('<cWORD>') :
-        \ a:mode == 'w' ? '\<'.wholeword.'\>' :
         \ a:mode == 'v' ? quickhl#get_selected_text() :
         \ ""
   if pattern == '' | return | endif
   " call s:decho("[toggle] " . pattern)
-  call quickhl#manual#add_or_del(pattern, a:mode)
+  call quickhl#manual#add_or_del(pattern)
 endfunction "}}}
 
-function! quickhl#manual#add_or_del(pattern, mode) "{{{
+function! quickhl#manual#add_or_del(pattern) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
-  if a:mode == 'n' || a:mode == 'l' || a:mode == 'v'
-      if s:manual.index_of(quickhl#escape(a:pattern)) == -1
-          call s:manual.add(a:pattern, 0)
-      else
-          call s:manual.del(a:pattern, 0)
-      endif
-  elseif a:mode == 'w'
-      if s:manual.index_of(a:pattern) == -1
-          call s:manual.add(a:pattern, 1)
-      else
-          call s:manual.del(a:pattern, 1)
-      endif
+  if s:manual.index_of(quickhl#escape(a:pattern)) == -1
+    call s:manual.add(a:pattern, 0)
+  else
+    call s:manual.del(a:pattern, 0)
   endif
   call quickhl#manual#refresh()
 endfunction "}}}
