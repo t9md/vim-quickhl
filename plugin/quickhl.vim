@@ -66,6 +66,7 @@ nnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('n')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#this_whole_word()<CR>
 nnoremap <silent> <Plug>(quickhl-manual-this-bigword) :call quickhl#manual#this_bigword()<CR>
 nnoremap <silent> <Plug>(quickhl-manual-this-whole-bigword) :call quickhl#manual#this_whole_bigword()<CR>
+nnoremap <silent> <Plug>(quickhl-manual-this-classish-bigword) :call quickhl#manual#this_classish_bigword()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>

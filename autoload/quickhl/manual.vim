@@ -195,6 +195,15 @@ function! quickhl#manual#this_whole_bigword() "{{{
   call quickhl#manual#refresh()
 endfunction "}}}
 
+function! quickhl#manual#this_classish_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let word = expand('<cword>')
+  if word == '' | return | endif
+  let bigword = expand('<cWORD>')
+  let pattern = matchstr(bigword, '\(\w\+\([.$]\)\?\)*'.word.'\([.$]\w\+\)*')
+  call quickhl#manual#add_or_del(pattern)
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =

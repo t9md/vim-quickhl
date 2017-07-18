@@ -38,7 +38,9 @@ n   <Plug>(quickhl-manual-this-whole-word)
 n   <Plug>(quickhl-manual-this-bigword)
 	  Highlight |<cWORD>|.
 n   <Plug>(quickhl-manual-this-whole-bigword)
-	  Highlight |<cWORD>|, respect word boundaries at both ends.
+          Highlight <cWORD>, respect word boundaries at both ends of WORD.
+n   <Plug>(quickhl-manual-this-classish-bigword)
+	  Highlight dot or dollar sign connected words, e.g. datetime.year
 v   <Plug>(quickhl-manual-this)
 	  Highlight selected text.
 
