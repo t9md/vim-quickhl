@@ -63,8 +63,9 @@ call s:set_default(s:default_settings)
 
 " Keymap: {{{
 nnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('n')<CR>
-nnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#this_whole_word()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-this) :call quickhl#manual#this('v')<CR>
+nnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#this_whole_word('n')<CR>
+vnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#this_whole_word('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>

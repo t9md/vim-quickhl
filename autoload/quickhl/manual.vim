@@ -155,19 +155,6 @@ function! s:manual.list() "{{{
   endfor
 endfunction "}}}
 
-function! quickhl#manual#this_whole_word() "{{{
-  if !s:manual.enabled | call quickhl#manual#enable() | endif
-  let whole_word = expand('<cword>')
-  if whole_word == '' | return | endif
-  let pattern = '\<'.whole_word.'\>'
-  if s:manual.index_of(pattern) == -1
-      call s:manual.add(pattern, 1)
-  else
-      call s:manual.del(pattern, 1)
-  endif
-  call quickhl#manual#refresh()
-endfunction "}}}
-
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =
@@ -176,15 +163,25 @@ function! quickhl#manual#this(mode) "{{{
         \ ""
   if pattern == '' | return | endif
   " call s:decho("[toggle] " . pattern)
-  call quickhl#manual#add_or_del(pattern)
+  call quickhl#manual#add_or_del(pattern, 0)
 endfunction "}}}
 
-function! quickhl#manual#add_or_del(pattern) "{{{
+function! quickhl#manual#this_whole_word(mode) "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let pattern =
+        \ a:mode == 'n' ? expand('<cword>') :
+        \ a:mode == 'v' ? quickhl#get_selected_text() :
+        \ ""
+  if pattern == '' | return | endif
+  call quickhl#manual#add_or_del('\<'.pattern.'\>', 1)
+endfunction "}}}
+
+function! quickhl#manual#add_or_del(pattern, escaped) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   if s:manual.index_of(quickhl#escape(a:pattern)) == -1
-    call s:manual.add(a:pattern, 0)
+    call s:manual.add(a:pattern, a:escaped)
   else
-    call s:manual.del(a:pattern, 0)
+    call s:manual.del(a:pattern, a:escaped)
   endif
   call quickhl#manual#refresh()
 endfunction "}}}
@@ -315,7 +312,7 @@ function! quickhl#manual#this_motion(motion_wise) " {{{
     elseif a:motion_wise == 'block' | let str = s.between
     endif
 
-    call quickhl#manual#add_or_del(str)
+    call quickhl#manual#add_or_del(str, 0)
   endfor
 endfunction " }}}
 
