@@ -181,6 +181,20 @@ function! quickhl#manual#this_bigword() "{{{
   call quickhl#manual#refresh()
 endfunction "}}}
 
+function! quickhl#manual#this_whole_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let bigword = expand('<cWORD>')
+  let escaped_bigword = quickhl#escape(bigword)
+  if escaped_bigword == '' | return | endif
+  let pattern = '\<'.escaped_bigword.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =
