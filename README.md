@@ -24,6 +24,7 @@ Full
 ```Vim
 nmap <Space>m <Plug>(quickhl-manual-this)
 nmap <Space>j <Plug>(quickhl-manual-this-whole-word)
+nmap <Space>l <Plug>(quickhl-manual-this-bigword)
 xmap <Space>m <Plug>(quickhl-manual-this)
 nmap <Space>M <Plug>(quickhl-manual-reset)
 xmap <Space>M <Plug>(quickhl-manual-reset)

@@ -168,6 +168,19 @@ function! quickhl#manual#this_whole_word() "{{{
   call quickhl#manual#refresh()
 endfunction "}}}
 
+function! quickhl#manual#this_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let bigword = expand('<cWORD>')
+  if bigword == '' | return | endif
+  let pattern = bigword
+  if s:manual.index_of(quickhl#escape(pattern)) == -1
+      call s:manual.add(pattern, 0)
+  else
+      call s:manual.del(pattern, 0)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =

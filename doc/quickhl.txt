@@ -35,6 +35,8 @@ n   <Plug>(quickhl-manual-this)
 	  Highlight |<cword>|.
 n   <Plug>(quickhl-manual-this-whole-word)
 	  Highlight |<cword>|, respect word boundaries.
+n   <Plug>(quickhl-manual-this-bigword)
+	  Highlight |<cWORD>|.
 v   <Plug>(quickhl-manual-this)
 	  Highlight selected text.
 
