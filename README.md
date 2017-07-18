@@ -22,9 +22,7 @@ xmap <Space>M <Plug>(quickhl-manual-reset)
 
 Full
 ```Vim
-nmap <Space>j <Plug>(quickhl-manual-this-word)
 nmap <Space>m <Plug>(quickhl-manual-this)
-nmap <Space>k <Plug>(quickhl-manual-this-broadword)
 xmap <Space>m <Plug>(quickhl-manual-this)
 nmap <Space>M <Plug>(quickhl-manual-reset)
 xmap <Space>M <Plug>(quickhl-manual-reset)
