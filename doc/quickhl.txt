@@ -33,17 +33,6 @@ MAPPINGS					*quickhl-mappings*
 
 n   <Plug>(quickhl-manual-this)
 	  Highlight |<cword>|.
-n   <Plug>(quickhl-manual-this-whole-word)
-	  Highlight |<cword>|, respect word boundaries.
-n   <Plug>(quickhl-manual-this-bigword)
-	  Highlight |<cWORD>|.
-n   <Plug>(quickhl-manual-this-whole-bigword)
-	  Highlight |<cWORD>|, respect word boundaries.
-n   <Plug>(quickhl-manual-this-classish-bigword)
-	  Highlight dot or dollar sign connected words, e.g. datetime.year
-n   <Plug>(quickhl-manual-this-whole-classish-bigword)
-	  Highlight dot or dollar sign connected words, respect word
-          boundaries.
 v   <Plug>(quickhl-manual-this)
 	  Highlight selected text.
 
