@@ -155,6 +155,19 @@ function! s:manual.list() "{{{
   endfor
 endfunction "}}}
 
+function! quickhl#manual#this_whole_word() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let whole_word = expand('<cword>')
+  if whole_word == '' | return | endif
+  let pattern = '\<'.whole_word.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =

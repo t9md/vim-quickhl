@@ -33,6 +33,8 @@ MAPPINGS					*quickhl-mappings*
 
 n   <Plug>(quickhl-manual-this)
 	  Highlight |<cword>|.
+n   <Plug>(quickhl-manual-this-whole-word)
+	  Highlight |<cword>|, respect word boundaries.
 v   <Plug>(quickhl-manual-this)
 	  Highlight selected text.
 
