@@ -195,6 +195,22 @@ function! quickhl#manual#this_whole_bigword() "{{{
   call quickhl#manual#refresh()
 endfunction "}}}
 
+function! quickhl#manual#this_whole_classish_bigword() "{{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let word = expand('<cword>')
+  if word == '' | return | endif
+  let bigword = expand('<cWORD>')
+  let matched = matchstr(bigword, '\(\w\+\([.$]\)\?\)*'.word.'\([.$]\w\+\)*')
+  let escaped_classish_word = quickhl#escape(matched)
+  let pattern = '\<'.escaped_classish_word.'\>'
+  if s:manual.index_of(pattern) == -1
+      call s:manual.add(pattern, 1)
+  else
+      call s:manual.del(pattern, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction "}}}
+
 function! quickhl#manual#this_classish_bigword() "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let word = expand('<cword>')

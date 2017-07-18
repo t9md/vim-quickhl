@@ -41,6 +41,9 @@ n   <Plug>(quickhl-manual-this-whole-bigword)
           Highlight <cWORD>, respect word boundaries at both ends of WORD.
 n   <Plug>(quickhl-manual-this-classish-bigword)
 	  Highlight dot or dollar sign connected words, e.g. datetime.year
+n   <Plug>(quickhl-manual-this-whole-classish-bigword)
+	  Highlight dot or dollar sign connected words, respect word
+          boundaries.
 v   <Plug>(quickhl-manual-this)
 	  Highlight selected text.
 
