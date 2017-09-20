@@ -173,12 +173,13 @@ function! quickhl#manual#this_whole_word(mode) "{{{
         \ a:mode == 'v' ? quickhl#get_selected_text() :
         \ ""
   if pattern == '' | return | endif
-  call quickhl#manual#add_or_del('\<'.pattern.'\>', 1)
+  call quickhl#manual#add_or_del('\<'. quickhl#escape(pattern).'\>', 1)
 endfunction "}}}
 
 function! quickhl#manual#add_or_del(pattern, escaped) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
-  if s:manual.index_of(quickhl#escape(a:pattern)) == -1
+
+  if s:manual.index_of(a:escaped?a:pattern:quickhl#escape(a:pattern)) == -1
     call s:manual.add(a:pattern, a:escaped)
   else
     call s:manual.del(a:pattern, a:escaped)
