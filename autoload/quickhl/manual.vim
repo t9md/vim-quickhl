@@ -176,6 +176,23 @@ function! quickhl#manual#this_whole_word(mode) "{{{
   call quickhl#manual#add_or_del('\<'. quickhl#escape(pattern).'\>', 1)
 endfunction "}}}
 
+function! quickhl#manual#clear_this(mode) " {{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let pattern =
+        \ a:mode == 'n' ? expand('<cword>') :
+        \ a:mode == 'v' ? quickhl#get_selected_text() :
+        \ ""
+  if pattern == '' | return | endif
+  let l:pattern_et = quickhl#escape(pattern)
+  let l:pattern_ew = '\<' . quickhl#escape(pattern) . '\>'
+  if s:manual.index_of(l:pattern_et) != -1
+    call s:manual.del(l:pattern_et, 1)
+  elseif s:manual.index_of(l:pattern_ew) != -1
+    call s:manual.del(l:pattern_ew, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction " }}}
+
 function! quickhl#manual#add_or_del(pattern, escaped) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
 
