@@ -13,7 +13,7 @@ endfunction "}}}
 
 function! s:cword.set() "{{{
   let pattern = quickhl#escape(expand('<cword>'))
-  exe "2match QuickhlCword /". pattern . "/"
+  exe "2match QuickhlCword /\\\<". pattern . "\\\>/"
 endfunction "}}}
 
 function! s:cword.clear() "{{{
