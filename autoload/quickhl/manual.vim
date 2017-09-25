@@ -173,12 +173,30 @@ function! quickhl#manual#this_whole_word(mode) "{{{
         \ a:mode == 'v' ? quickhl#get_selected_text() :
         \ ""
   if pattern == '' | return | endif
-  call quickhl#manual#add_or_del('\<'.pattern.'\>', 1)
+  call quickhl#manual#add_or_del('\<'. quickhl#escape(pattern).'\>', 1)
 endfunction "}}}
+
+function! quickhl#manual#clear_this(mode) " {{{
+  if !s:manual.enabled | call quickhl#manual#enable() | endif
+  let pattern =
+        \ a:mode == 'n' ? expand('<cword>') :
+        \ a:mode == 'v' ? quickhl#get_selected_text() :
+        \ ""
+  if pattern == '' | return | endif
+  let l:pattern_et = quickhl#escape(pattern)
+  let l:pattern_ew = '\<' . quickhl#escape(pattern) . '\>'
+  if s:manual.index_of(l:pattern_et) != -1
+    call s:manual.del(l:pattern_et, 1)
+  elseif s:manual.index_of(l:pattern_ew) != -1
+    call s:manual.del(l:pattern_ew, 1)
+  endif
+  call quickhl#manual#refresh()
+endfunction " }}}
 
 function! quickhl#manual#add_or_del(pattern, escaped) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
-  if s:manual.index_of(quickhl#escape(a:pattern)) == -1
+
+  if s:manual.index_of(a:escaped?a:pattern:quickhl#escape(a:pattern)) == -1
     call s:manual.add(a:pattern, a:escaped)
   else
     call s:manual.del(a:pattern, a:escaped)

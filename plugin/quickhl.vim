@@ -68,6 +68,8 @@ nnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#th
 vnoremap <silent> <Plug>(quickhl-manual-this-whole-word) :call quickhl#manual#this_whole_word('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-reset)  :call quickhl#manual#reset()<CR>
+nnoremap <silent> <Plug>(quickhl-manual-clear)  :call quickhl#manual#clear_this('n')<CR>
+vnoremap <silent> <Plug>(quickhl-manual-clear)  :call quickhl#manual#clear_this('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
 
