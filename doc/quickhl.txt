@@ -42,6 +42,10 @@ n   <Plug>(quickhl-manual-reset)
 v   <Plug>(quickhl-manual-reset)
 	  Clear all manually added highlight
 
+n   <Plug>(quickhl-manual-clear)
+v   <Plug>(quickhl-manual-clear)
+	  Clear the manually added highlight under current cursor.
+
 n   <Plug>(quickhl-manual-toggle)
 v   <Plug>(quickhl-manual-toggle)
 	  Toggle global lock
