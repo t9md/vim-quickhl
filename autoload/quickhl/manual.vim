@@ -196,7 +196,7 @@ endfunction " }}}
 function! quickhl#manual#add_or_del(pattern, escaped) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
 
-  if s:manual.index_of(a:escaped?a:pattern:quickhl#escape(a:pattern)) == -1
+  if s:manual.index_of(a:escaped ? a:pattern : quickhl#escape(a:pattern)) == -1
     call s:manual.add(a:pattern, a:escaped)
   else
     call s:manual.del(a:pattern, a:escaped)
