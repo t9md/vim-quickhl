@@ -103,7 +103,7 @@ VARIABLES						*quickhl-variables*
 	Default: 10
 
 	These priority value is used when highlight with |matchadd()|.
-	The bigger value overwite lower prioritized highlight.
+	The bigger value overwrite lower prioritized highlight.
 
 *g:quickhl_manual_colors*
 	Default: 13 colors defined. see 'plugin/quickhl.vim' for detail.
@@ -123,7 +123,7 @@ VARIABLES						*quickhl-variables*
 	"keyword1"
 	Dictionary~
 	{ "pattern": 'KEYWORD', "regexp": 1 }
-	"regexp" is optional, if you set it to 1, the KEYWORD you sepcified
+	"regexp" is optional, if you set it to 1, the KEYWORD you specified
 	will not escaped, so it's useful you want to add 'regexp' keyword.
 
 [ tag ]~

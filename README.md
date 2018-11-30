@@ -8,7 +8,7 @@ quickhl.vim support highlight for
 
 - manual keywords
 - `tag` in ctags generated file
-- automatically higlight word under cursor(`<cword>`).
+- automatically highlight word under cursor(`<cword>`).
 
 # Config
 
