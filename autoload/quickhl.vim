@@ -33,7 +33,7 @@ function! quickhl#windo(func, obj) "{{{
   " echo PP(a:obj)
   "
   let all_win = range(1, winnr('$'))
-  let popup_win = popup_findinfo()
+  let popup_win = win_id2win(popup_findinfo())
 
   if popup_win !=# 0
     call filter(all_win, 'v:val !=# popup_win')
