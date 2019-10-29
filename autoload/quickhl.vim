@@ -31,7 +31,17 @@ function! quickhl#windo(func, obj) "{{{
   " echo [pwinnum, winnum]
   " echo PP(a:func)
   " echo PP(a:obj)
-  noautocmd windo call call(a:func, [], a:obj)
+  "
+  let all_win = range(1, winnr('$'))
+  let popup_win = popup_findinfo()
+
+  if popup_win !=# 0
+    call filter(all_win, 'v:val !=# popup_win')
+  endif
+
+  for winno in all_win
+    noautocmd execute winno . "windo call call(a:func, [], a:obj)"
+  endfor
 
   if pwinnum !=# 0
     execute pwinnum . "wincmd w"
