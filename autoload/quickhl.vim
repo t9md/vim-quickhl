@@ -29,8 +29,10 @@ function! quickhl#windo(func, obj) abort "{{{
   " [BUG] This function is invoked from WinEnter event.
   " Unexpectedly, this event is happen before buffer is not shown on window when invoke `pedit file`.
   " So here I will skip unxexisting buffer(which return `-1`) to avoid E994 error.
-  if bufwinid('') ==# -1
-    return
+  if exists('*bufwinid')
+    if bufwinid('') ==# -1
+      return
+    endif
   endif
   let winnum = winnr()
   let pwinnum = winnr('#')
