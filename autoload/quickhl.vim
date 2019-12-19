@@ -34,17 +34,21 @@ function! quickhl#windo(func, obj) abort "{{{
       return
     endif
   endif
-  let winnum = winnr()
-  let pwinnum = winnr('#')
-  " echo [pwinnum, winnum]
-  " echo PP(a:func)
-  " echo PP(a:obj)
-  noautocmd windo call call(a:func, [], a:obj)
-  
-  if pwinnum !=# 0
-    execute pwinnum . "wincmd w"
+  if exists('*win_execute')
+    call map(range(1, winnr('$')), "win_execute(win_getid(v:val), 'call call(a:func, [], a:obj)')")
+  else
+    let winnum = winnr()
+    let pwinnum = winnr('#')
+    " echo [pwinnum, winnum]
+    " echo PP(a:func)
+    " echo PP(a:obj)
+    noautocmd windo call call(a:func, [], a:obj)
+
+    if pwinnum !=# 0
+      execute pwinnum . "wincmd w"
+    endif
+    execute winnum . "wincmd w"
   endif
-  execute winnum . "wincmd w"
 endfunction "}}}
 
 " vim: foldmethod=marker
