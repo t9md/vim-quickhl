@@ -155,6 +155,17 @@ function! s:manual.list() "{{{
   endfor
 endfunction "}}}
 
+function! s:manual.search(flag) "{{{
+  let pattern = ''
+  for color in self.colors
+    if color.pattern != ''
+      let pattern = pattern . '\|' . color.pattern
+    endif
+  endfor
+  " eliminate first '\|'
+  call search(pattern->strpart(2), a:flag)
+endfunction "}}}
+
 function! quickhl#manual#this(mode) "{{{
   if !s:manual.enabled | call quickhl#manual#enable() | endif
   let pattern =
@@ -306,6 +317,22 @@ endfunction "}}}
 
 function! quickhl#manual#init_highlight() "{{{
   call s:manual.init_highlight()
+endfunction "}}}
+
+function! quickhl#manual#next(...) "{{{
+  let flags = ""
+  if a:0 == 1
+    let flags = a:1
+  endif
+  call s:manual.search("" . flags)
+endfunction "}}}
+
+function! quickhl#manual#prev(...) "{{{
+  let flags = ""
+  if a:0 == 1
+    let flags = a:1
+  endif
+  call s:manual.search("b" . flags)
 endfunction "}}}
 
 function! quickhl#manual#this_motion(motion_wise) " {{{

@@ -50,6 +50,10 @@ n   <Plug>(quickhl-manual-toggle)
 v   <Plug>(quickhl-manual-toggle)
 	  Toggle global lock
 
+n   <Plug>(quickhl-manual-next)
+n   <Plug>(quickhl-manual-prev)
+	  Jump to next/previous highlight
+
 n   <Plug>(quickhl-cword-toggle)
 n   <Plug>(quickhl-cword-enable)
 n   <Plug>(quickhl-cword-disable)
@@ -84,6 +88,10 @@ COMMANDS						*quickhl-commands*
 *:QuickhlManualLockWindow*	Lock version of current window.
 *:QuickhlManualUnlockWindow*	Unlock current window.
 *:QuickhlManualLockWindowToggle*  Toggle window lock.
+*:QuickhlManualNext* {flags}	Jump to next highlight.
+*:QuickhlManualPrev* {flags}	Jump to previous highlight.
+				{flags} is passed |search()|.
+				see ":help search()"
 
 *:QuickhlCwordEnable*	Enable highlighting <cword> (updated on |CursorMoved|).
 *:QuickhlCwordDisable*	Disable.
