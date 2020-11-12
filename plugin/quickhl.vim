@@ -72,8 +72,8 @@ nnoremap <silent> <Plug>(quickhl-manual-clear)  :call quickhl#manual#clear_this(
 vnoremap <silent> <Plug>(quickhl-manual-clear)  :call quickhl#manual#clear_this('v')<CR>
 nnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
 vnoremap <silent> <Plug>(quickhl-manual-toggle) :call quickhl#manual#lock_toggle()<CR>
-nnoremap <silent> <Plug>(quickhl-manual-next)   :call quickhl#manual#next('s')<CR>
-nnoremap <silent> <Plug>(quickhl-manual-prev)   :call quickhl#manual#prev('s')<CR>
+nnoremap <silent> <Plug>(quickhl-manual-go-to-next) :call quickhl#manual#go_to_next('s')<CR>
+nnoremap <silent> <Plug>(quickhl-manual-go-to-prev) :call quickhl#manual#go_to_prev('s')<CR>
 
 nnoremap <silent> <Plug>(quickhl-cword-toggle)  :call quickhl#cword#toggle()<CR>
 nnoremap <silent> <Plug>(quickhl-cword-enable)  :call quickhl#cword#enable()<CR>
@@ -94,8 +94,8 @@ command! -bang -nargs=1 QuickhlManualAdd     :call quickhl#manual#add(<q-args>,<
 command! -bang -nargs=* QuickhlManualDelete  :call quickhl#manual#del(<q-args>,<bang>0)
 command!                QuickhlManualLock    :call quickhl#manual#lock()
 
-command!       -nargs=? QuickhlManualNext    :call quickhl#manual#next(<f-args>)
-command!       -nargs=? QuickhlManualPrev    :call quickhl#manual#prev(<f-args>)
+command!       -nargs=? QuickhlManualGoToNext :call quickhl#manual#go_to_next(<f-args>)
+command!       -nargs=? QuickhlManualGoToPrev :call quickhl#manual#go_to_prev(<f-args>)
 
 command! QuickhlManualUnlock            :call quickhl#manual#unlock()
 command! QuickhlManualLockToggle        :call quickhl#manual#lock_toggle()

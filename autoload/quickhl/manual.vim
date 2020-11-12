@@ -319,7 +319,7 @@ function! quickhl#manual#init_highlight() "{{{
   call s:manual.init_highlight()
 endfunction "}}}
 
-function! quickhl#manual#next(...) "{{{
+function! quickhl#manual#go_to_next(...) "{{{
   let flags = ""
   if a:0 == 1
     let flags = a:1
@@ -327,7 +327,7 @@ function! quickhl#manual#next(...) "{{{
   call s:manual.search("" . flags)
 endfunction "}}}
 
-function! quickhl#manual#prev(...) "{{{
+function! quickhl#manual#go_to_prev(...) "{{{
   let flags = ""
   if a:0 == 1
     let flags = a:1
