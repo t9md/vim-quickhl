@@ -163,7 +163,7 @@ function! s:manual.search(flag) "{{{
     endif
   endfor
   " eliminate first '\|'
-  call search(pattern->strpart(2), a:flag)
+  call search(strpart(pattern, 2), a:flag)
 endfunction "}}}
 
 function! quickhl#manual#this(mode) "{{{
