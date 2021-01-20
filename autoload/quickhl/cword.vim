@@ -13,8 +13,9 @@ function! s:cword.init_highlight() "{{{
 endfunction "}}}
 
 function! s:cword.set() "{{{
-  let pattern = quickhl#escape(expand('<cword>'))
-  if !s:cword.override_search && (pattern == @/ || '\<'.pattern.'\>' == @/) | return | endif
+  let cword = expand('<cword>')
+  if !s:cword.override_search && match(cword, @/) >= 0 | return | endif
+  let pattern = quickhl#escape(cword)
   exe "2match QuickhlCword /\\\<". pattern . "\\\>/"
 endfunction "}}}
 
