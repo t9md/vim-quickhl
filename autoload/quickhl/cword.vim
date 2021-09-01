@@ -1,5 +1,6 @@
 let s:cword = {
       \ "enable": g:quickhl_cword_enable_at_startup,
+      \ "override_search": g:quickhl_cword_override_search,
       \ }
 
 function! s:cword.init() "{{{
@@ -12,7 +13,9 @@ function! s:cword.init_highlight() "{{{
 endfunction "}}}
 
 function! s:cword.set() "{{{
-  let pattern = quickhl#escape(expand('<cword>'))
+  let cword = expand('<cword>')
+  if !s:cword.override_search && match(cword, @/) >= 0 | return | endif
+  let pattern = quickhl#escape(cword)
   exe "2match QuickhlCword /\\\<". pattern . "\\\>/"
 endfunction "}}}
 

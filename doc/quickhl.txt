@@ -164,6 +164,10 @@ VARIABLES						*quickhl-variables*
 
 	Passed to |:highlight|. Set this if you want change default highlight.
 
+*g:quickhl_cword_override_search*
+	Default: 1
+	Whether the cword highlighting should apply to the current search term.
+
 ==============================================================================
 CONFIGURATION EXAMPLE				    *quickhl-examples*
 

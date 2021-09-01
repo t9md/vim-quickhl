@@ -48,6 +48,7 @@ let s:default_settings = {
       \ "g:quickhl_tag_minimum_identifier": 4,
       \ "g:quickhl_cword_enable_at_startup": 0,
       \ "g:quickhl_cword_hl_command": 'link QuickhlCword Search',
+      \ "g:quickhl_cword_override_search": 1,
       \ }
 
 function! s:set_default(dict) "{{{
