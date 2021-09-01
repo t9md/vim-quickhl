@@ -10,6 +10,7 @@
 <
 Version: 1.0
 Author : t9md <taqumd@gmail.com>
+License: zlib License
 GitHub : https://github.com/t9md/vim-quickhl
 ==============================================================================
 CONTENTS					*quickhl-contents*
