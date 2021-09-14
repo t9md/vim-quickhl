@@ -16,7 +16,7 @@ GitHub : https://github.com/t9md/vim-quickhl
 CONTENTS					*quickhl-contents*
 
 Introduction				    |quickhl-introduction|
-Mapping					    |quickhl-mapping|
+Mapping					    |quickhl-mappings|
 Commands				    |quickhl-commands|
 Variables				    |quickhl-variables|
 Configuration Examples			    |quickhl-examples|
